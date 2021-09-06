@@ -231,6 +231,7 @@ public final class ServiceLocator implements ServiceProvider<Service> {
   public static class DependencySet implements Builder<ServiceLocator> {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
+    // yukms TODO: spi
     private final Iterable<ServiceFactory<?>> serviceFactories = (Iterable) servicesOfType(ServiceFactory.class);
 
     private final ServiceMap provided = new ServiceMap();

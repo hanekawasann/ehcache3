@@ -70,6 +70,7 @@ enum InternalStatus {
     throw new IllegalStateException("Init not supported from " + name());
   }
 
+  // yukms TODO: 切换后的状态
   public Transition close() {
     throw new IllegalStateException("Close not supported from " + name());
   }
@@ -96,10 +97,13 @@ enum InternalStatus {
 
     public InternalStatus get() {
       if(done != null) {
+        // yukms TODO: 状态已切换成功
         return done;
       } else if(owner == Thread.currentThread()) {
+        // yukms TODO: 这里是什么意思
         return to.compareTo(from()) > 0 ? to : from();
       }
+      // yukms TODO: 还未切换状态则等待
       synchronized (this) {
         boolean interrupted = false;
         try {
@@ -120,7 +124,9 @@ enum InternalStatus {
     }
 
     public synchronized void succeeded() {
+      // yukms TODO: 切换状态
       done = to;
+      // yukms TODO: 唤醒其他等待的线程
       notifyAll();
     }
 
@@ -143,6 +149,7 @@ enum InternalStatus {
   }
 
   public static Transition initial() {
+    // yukms TODO: 类似于状态机、
     final Transition close = MAINTENANCE.close();
     close.succeeded();
     return close;

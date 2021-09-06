@@ -143,6 +143,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
       .with(CacheEventListenerProvider.class)
       .with(ResilienceStrategyProvider.class);
 
+    // yukms TODO: builder.with(services)
     builder = customization.apply(builder);
 
     if (!builder.contains(CacheManagerProviderService.class)) {
@@ -600,6 +601,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
         }
         throw e;
       }
+      // yukms TODO: UNINITIALIZED -> AVAILABLE
       st.succeeded();
     } catch (Exception e) {
       throw st.failed(e);

@@ -73,6 +73,7 @@ final class StatusTransitioner {
   Transition init() {
     logger.trace("Initializing");
     InternalStatus.Transition st;
+    // yukms TODO: MAINTENANCE -> UNINITIALIZED
     for (InternalStatus.Transition cs; !currentState.compareAndSet(cs = currentState.get(), st = cs.get().init()););
     return new Transition(st, null, "Initialize");
   }
