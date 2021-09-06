@@ -231,7 +231,7 @@ public final class ServiceLocator implements ServiceProvider<Service> {
   public static class DependencySet implements Builder<ServiceLocator> {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    // yukms TODO: spi
+    // yukms TODO: spi org.ehcache.core.spi.service.ServiceFactory = org.ehcache.core.internal.statistics.DefaultStatisticsServiceFactory
     private final Iterable<ServiceFactory<?>> serviceFactories = (Iterable) servicesOfType(ServiceFactory.class);
 
     private final ServiceMap provided = new ServiceMap();
