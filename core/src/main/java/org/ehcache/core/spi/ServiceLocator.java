@@ -234,7 +234,9 @@ public final class ServiceLocator implements ServiceProvider<Service> {
     // yukms TODO: spi org.ehcache.core.spi.service.ServiceFactory = org.ehcache.core.internal.statistics.DefaultStatisticsServiceFactory
     private final Iterable<ServiceFactory<?>> serviceFactories = (Iterable) servicesOfType(ServiceFactory.class);
 
+    // yukms TODO: 已经实例化的service
     private final ServiceMap provided = new ServiceMap();
+    // yukms TODO: 待实例化的service
     private final Set<Class<? extends Service>> requested = new HashSet<>();
     private boolean includeMandatoryServices = true;
 
@@ -255,16 +257,20 @@ public final class ServiceLocator implements ServiceProvider<Service> {
 
       //TODO : This stanza is due to the way we use configure the JSR-107 service
       if (provided.contains(serviceType) && !serviceType.isAnnotationPresent(PluralService.class)) {
+        // yukms TODO: 已经实例化并且不支持复数service，则跳过
         return this;
       }
 
+      // yukms TODO: 找到ServiceCreationConfiguration对应的ServiceFactory
       @SuppressWarnings("unchecked")
       Collection<ServiceFactory<T>> typedServiceFactories = stream(serviceFactories.spliterator(), false)
         .filter(f -> serviceType.isAssignableFrom(f.getServiceType())).map(f -> (ServiceFactory<T>) f)
         .collect(toList());
 
+      // yukms TODO: 取优先级最高的ServiceFactory
       OptionalInt highestRank = typedServiceFactories.stream().mapToInt(ServiceFactory::rank).max();
 
+      // yukms TODO: 创建service
       if (highestRank.isPresent()) {
         typedServiceFactories.stream().filter(f -> highestRank.getAsInt() == f.rank()).forEach(f -> with(f.create(config)));
         return this;
@@ -313,10 +319,12 @@ public final class ServiceLocator implements ServiceProvider<Service> {
       try {
         ServiceMap resolvedServices = new ServiceMap();
 
+        // yukms TODO: 查找已经实例话的service的依赖且放入resolvedServices
         for (Service service : provided.all()) {
           resolvedServices = lookupDependenciesOf(resolvedServices, service.getClass()).add(service);
         }
 
+        // yukms TODO: 查找requested依赖并且放入resolvedServices
         for (Class<? extends Service> request : requested) {
           if (request.isAnnotationPresent(PluralService.class)) {
             try {
@@ -331,6 +339,7 @@ public final class ServiceLocator implements ServiceProvider<Service> {
           }
         }
 
+        // yukms TODO: 创建所有的ServiceFactory的service
         if (includeMandatoryServices) {
           for (List<ServiceFactory<?>> factories : stream(serviceFactories.spliterator(), false).collect(groupingBy(ServiceFactory::getServiceType)).values()) {
             OptionalInt highestRank = factories.stream().mapToInt(ServiceFactory::rank).max();
@@ -369,15 +378,20 @@ public final class ServiceLocator implements ServiceProvider<Service> {
     }
 
     private <T extends Service> ServiceMap lookupService(ServiceMap resolved, Class<T> requested) throws DependencyException {
+      // yukms TODO: 已处理
       //Have we already resolved this dependency?
       if (resolved.contains(requested) && !requested.isAnnotationPresent(PluralService.class)) {
         return resolved;
       }
+
+      // yukms TODO: provided
       //Attempt resolution from the provided services
       resolved = new ServiceMap(resolved).addAll(provided.get(requested));
       if (resolved.contains(requested) && !requested.isAnnotationPresent(PluralService.class)) {
         return resolved;
       }
+
+      // yukms TODO: ServiceFactory
       Collection<ServiceFactory<? extends T>> serviceFactories = discoverServices(resolved, requested);
       if (serviceFactories.size() > 1 && !requested.isAnnotationPresent(PluralService.class)) {
         throw new DependencyException("Multiple factories for non-plural service");
@@ -390,12 +404,16 @@ public final class ServiceLocator implements ServiceProvider<Service> {
             continue;
           }
 
+          // yukms TODO: 创建依赖
           T service = factory.create(null);
 
+          // yukms TODO: 这里说明了复制的原因
           //we copy the service map so that if upstream dependency resolution fails we don't pollute the real resolved set
           resolved = new ServiceMap(resolved).add(service);
         }
       }
+
+      // yukms TODO: 检测是否创建到依赖
       if (resolved.contains(requested)) {
         return resolved;
       } else {
@@ -451,6 +469,7 @@ public final class ServiceLocator implements ServiceProvider<Service> {
       return emptySet();
     }
 
+    // yukms TODO: 依赖
     Set<Class<? extends Service>> dependencies = new HashSet<>();
     ServiceDependencies annotation = clazz.getAnnotation(ServiceDependencies.class);
     if (annotation != null) {
@@ -465,6 +484,8 @@ public final class ServiceLocator implements ServiceProvider<Service> {
         }
       }
     }
+
+    // yukms TODO: 可选依赖
     OptionalServiceDependencies optionalAnnotation = clazz.getAnnotation(OptionalServiceDependencies.class);
     if (optionalAnnotation != null) {
       for (String className : optionalAnnotation.value()) {
@@ -483,12 +504,14 @@ public final class ServiceLocator implements ServiceProvider<Service> {
       }
     }
 
+    // yukms TODO: 实现接口的依赖
     for (Class<?> interfaceClazz : clazz.getInterfaces()) {
       if (Service.class.isAssignableFrom(interfaceClazz)) {
         dependencies.addAll(identifyImmediateDependenciesOf(Service.class.getClass().cast(interfaceClazz)));
       }
     }
 
+    // yukms TODO: 继承类的依赖
     dependencies.addAll(identifyImmediateDependenciesOf(clazz.getSuperclass()));
 
     return dependencies;

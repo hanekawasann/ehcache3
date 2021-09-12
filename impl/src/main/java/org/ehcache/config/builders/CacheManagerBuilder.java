@@ -69,6 +69,7 @@ public class CacheManagerBuilder<T extends CacheManager> implements Builder<T> {
    * @param init whether the returned {@code CacheManager} is to be initialized or not
    * @return a {@code CacheManager} or a subtype of it
    */
+  // yukms TODO: 重点代码
   public T build(final boolean init) {
     final T cacheManager = newCacheManager(services, configBuilder.build());
     if(init) {

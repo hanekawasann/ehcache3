@@ -122,6 +122,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
     this.cacheManagerClassLoader = config.getClassLoader() != null ? config.getClassLoader() : ClassLoading.getDefaultClassLoader();
     this.useLoaderInAtomics = useLoaderInAtomics;
     validateServicesConfigs();
+    // yukms TODO: 重点代码，如何构建服务与服务的依赖关系
     this.serviceLocator = resolveServices(customization);
   }
 
@@ -152,7 +153,6 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
     for (ServiceCreationConfiguration<?, ?> serviceConfig : configuration.getServiceCreationConfigurations()) {
       builder = builder.with(serviceConfig);
     }
-    // yukms TODO: 2021年9月6日 23:52:02看到这里
     return builder.build();
   }
 
@@ -254,20 +254,24 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
     return createCache(alias, config, true);
   }
 
+  // yukms TODO: 重点代码
   private <K, V> Cache<K, V> createCache(String alias, CacheConfiguration<K, V> originalConfig, boolean addToConfig) throws IllegalArgumentException {
     statusTransitioner.checkAvailable();
 
     LOGGER.debug("Creating Cache '{}' in {}.", alias, simpleName);
 
+    // yukms TODO: 配置调整
     CacheConfiguration<K, V> config = adjustConfigurationWithCacheManagerDefaults(alias, originalConfig);
     Class<K> keyType = config.getKeyType();
     Class<V> valueType = config.getValueType();
 
+    // yukms TODO: 创建CacheHolder
     CacheHolder value = new CacheHolder(keyType, valueType);
     if (caches.putIfAbsent(alias, value) != null) {
       throw new IllegalArgumentException("Cache '" + alias +"' already exists");
     }
 
+    // yukms TODO: 创建InternalCache
     InternalCache<K, V> cache = null;
 
     boolean success = false;
@@ -290,6 +294,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
       }
     }
 
+    // yukms TODO: 通知监听者
     if(failure == null) {
       try {
         if(!statusTransitioner.isTransitioning()) {
@@ -534,11 +539,13 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
    *  adjusts the config to reflect new classloader & serialization provider
    */
   private <K, V> CacheConfiguration<K, V> adjustConfigurationWithCacheManagerDefaults(String alias, CacheConfiguration<K, V> config) {
+    // yukms TODO: classloader
     if (config.getClassLoader() == null && cacheManagerClassLoader != null) {
       config = config.derive().withClassLoader(cacheManagerClassLoader).build();
     }
 
-
+    // yukms TODO: serialization provider
+    // yukms TODO: 没看明白
     CacheLoaderWriterConfiguration<?> loaderWriterConfiguration = findSingletonAmongst(CacheLoaderWriterConfiguration.class, config.getServiceConfigurations());
     if (loaderWriterConfiguration == null) {
       CacheLoaderWriterProvider loaderWriterProvider = serviceLocator.getService(CacheLoaderWriterProvider.class);
@@ -574,6 +581,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
    */
   @Override
   public void init() {
+    // yukms TODO: 重点代码
     final StatusTransitioner.Transition st = statusTransitioner.init();
     try {
       serviceLocator.startAllServices();
