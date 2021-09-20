@@ -16,6 +16,24 @@
 
 package org.ehcache.core;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.UnaryOperator;
+
+import static org.ehcache.core.spi.ServiceLocator.dependencySet;
+import static org.ehcache.core.spi.service.ServiceUtils.findOptionalAmongst;
+import static org.ehcache.core.spi.service.ServiceUtils.findSingletonAmongst;
 import org.ehcache.Cache;
 import org.ehcache.CachePersistenceException;
 import org.ehcache.PersistentCacheManager;
@@ -33,10 +51,10 @@ import org.ehcache.core.events.CacheEventDispatcherFactory;
 import org.ehcache.core.events.CacheEventListenerConfiguration;
 import org.ehcache.core.events.CacheEventListenerProvider;
 import org.ehcache.core.events.CacheManagerListener;
-import org.ehcache.core.spi.ServiceLocator;
 import org.ehcache.core.resilience.DefaultRecoveryStore;
 import org.ehcache.core.spi.LifeCycled;
 import org.ehcache.core.spi.LifeCycledAdapter;
+import org.ehcache.core.spi.ServiceLocator;
 import org.ehcache.core.spi.service.CacheManagerProviderService;
 import org.ehcache.core.spi.service.ServiceUtils;
 import org.ehcache.core.spi.store.InternalCacheManager;
@@ -63,25 +81,6 @@ import org.ehcache.spi.service.ServiceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.UnaryOperator;
-
-import static org.ehcache.core.spi.ServiceLocator.dependencySet;
-import static org.ehcache.core.spi.service.ServiceUtils.findOptionalAmongst;
-import static org.ehcache.core.spi.service.ServiceUtils.findSingletonAmongst;
-
 /**
  * Implementation class for the {@link org.ehcache.CacheManager} and {@link PersistentCacheManager}
  * <p>
@@ -96,6 +95,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
   private final ClassLoader cacheManagerClassLoader;
 
   private final boolean useLoaderInAtomics;
+  // yukms TODO: 缓存
   private final ConcurrentMap<String, CacheHolder> caches = new ConcurrentHashMap<>();
   private final CopyOnWriteArrayList<CacheManagerListener> listeners = new CopyOnWriteArrayList<>();
 
@@ -317,6 +317,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
                                         Class<K> keyType, Class<V> valueType) {
     Collection<ServiceConfiguration<?, ?>> adjustedServiceConfigs = new ArrayList<>(config.getServiceConfigurations());
 
+    // yukms TODO: 检测无法识别的ServiceConfiguration
     List<ServiceConfiguration<?, ?>> unknownServiceConfigs = new ArrayList<>();
     for (ServiceConfiguration<?, ?> serviceConfig : adjustedServiceConfigs) {
       if (!serviceLocator.knowsServiceFor(serviceConfig)) {
@@ -327,17 +328,20 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
       throw new IllegalStateException("Cannot find service(s) that can handle following configuration(s) : " + unknownServiceConfigs);
     }
 
+    // yukms TODO: CacheLoaderWriter
     List<LifeCycled> lifeCycledList = new ArrayList<>();
 
     CacheLoaderWriterProvider cacheLoaderWriterProvider = serviceLocator.getService(CacheLoaderWriterProvider.class);
     CacheLoaderWriter<? super K, V> loaderWriter;
     if(cacheLoaderWriterProvider != null) {
+      // yukms TODO: 创建CacheLoaderWriter
       loaderWriter = cacheLoaderWriterProvider.createCacheLoaderWriter(alias, config);
 
       if (loaderWriter != null) {
         lifeCycledList.add(new LifeCycledAdapter() {
           @Override
           public void close() throws Exception {
+            // yukms TODO: 释放CacheLoaderWriter
             cacheLoaderWriterProvider.releaseCacheLoaderWriter(alias, loaderWriter);
           }
         });
@@ -346,20 +350,24 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
       loaderWriter = null;
     }
 
+    // yukms TODO: 创建Store
     Store<K, V> store = getStore(alias, config, keyType, valueType, adjustedServiceConfigs, lifeCycledList, loaderWriter);
 
-
+    // yukms TODO: CacheEventDispatcher
     CacheEventDispatcherFactory cenlProvider = serviceLocator.getService(CacheEventDispatcherFactory.class);
+    // yukms TODO: 创建CacheEventDispatcher
     CacheEventDispatcher<K, V> evtService =
         cenlProvider.createCacheEventDispatcher(store, adjustedServiceConfigs.toArray(new ServiceConfiguration<?, ?>[adjustedServiceConfigs.size()]));
     lifeCycledList.add(new LifeCycledAdapter() {
       @Override
       public void close() {
+        // yukms TODO: 释放CacheEventDispatcher
         cenlProvider.releaseCacheEventDispatcher(evtService);
       }
     });
     evtService.setStoreEventSource(store.getStoreEventSource());
 
+    // yukms TODO: 创建ResilienceStrategy
     ResilienceStrategyProvider resilienceProvider = serviceLocator.getService(ResilienceStrategyProvider.class);
     ResilienceStrategy<K, V> resilienceStrategy;
     if (loaderWriter == null) {
@@ -367,16 +375,21 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
     } else {
       resilienceStrategy = resilienceProvider.createResilienceStrategy(alias, config, new DefaultRecoveryStore<>(store), loaderWriter);
     }
+
+    // yukms TODO: InternalCache
     InternalCache<K, V> cache = new Ehcache<>(config, store, resilienceStrategy, evtService, LoggerFactory.getLogger(Ehcache.class + "-" + alias), loaderWriter);
 
+    // yukms TODO: CacheEventListener
     CacheEventListenerProvider evntLsnrFactory = serviceLocator.getService(CacheEventListenerProvider.class);
     if (evntLsnrFactory != null) {
       @SuppressWarnings("unchecked")
       Collection<CacheEventListenerConfiguration<?>> evtLsnrConfigs =
           ServiceUtils.<Class<CacheEventListenerConfiguration<?>>>findAmongst((Class) CacheEventListenerConfiguration.class, config.getServiceConfigurations());
       for (CacheEventListenerConfiguration<?> lsnrConfig: evtLsnrConfigs) {
+        // yukms TODO: 创建CacheEventListener
         CacheEventListener<K, V> lsnr = evntLsnrFactory.createEventListener(alias, lsnrConfig);
         if (lsnr != null) {
+          // yukms TODO: 注册事件监听器
           cache.getRuntimeConfiguration().registerCacheEventListener(lsnr, lsnrConfig.orderingMode(), lsnrConfig.firingMode(),
               lsnrConfig.fireOn());
           lifeCycledList.add(new LifeCycled() {
@@ -387,6 +400,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
 
             @Override
             public void close() throws Exception {
+              // yukms TODO: 释放CacheEventListener
               evntLsnrFactory.releaseEventListener(lsnr);
             }
           });
@@ -423,19 +437,22 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
                                        Class<K> keyType, Class<V> valueType,
                                        Collection<ServiceConfiguration<?, ?>> serviceConfigs,
                                        List<LifeCycled> lifeCycledList, CacheLoaderWriter<? super K, V> loaderWriter) {
-
+    // yukms TODO: 容量配置
     final Set<ResourceType<?>> resourceTypes = config.getResourcePools().getResourceTypeSet();
     for (ResourceType<?> resourceType : resourceTypes) {
       if (resourceType.isPersistable()) {
         final PersistableResourceService persistableResourceService = getPersistableResourceService(resourceType);
 
         try {
+          // yukms TODO: 创建PersistenceSpaceIdentifier
           final PersistableResourceService.PersistenceSpaceIdentifier<?> spaceIdentifier = persistableResourceService
               .getPersistenceSpaceIdentifier(alias, config);
+          // yukms TODO: 为什么作为配置项加入
           serviceConfigs.add(spaceIdentifier);
           lifeCycledList.add(new LifeCycledAdapter() {
             @Override
             public void close() throws Exception {
+              // yukms TODO: 释放PersistenceSpaceIdentifier
               persistableResourceService.releasePersistenceSpaceIdentifier(spaceIdentifier);
             }
           });
@@ -445,28 +462,36 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
       }
     }
 
+    // yukms TODO: key与value的序列化器
     Serializer<K> keySerializer = null;
     Serializer<V> valueSerializer = null;
+    // yukms TODO: 是不是如果没有使用磁盘等需要序列的话的缓存就不会有SerializationProvider
     final SerializationProvider serialization = serviceLocator.getService(SerializationProvider.class);
     ServiceConfiguration<?, ?>[] serviceConfigArray = serviceConfigs.toArray(new ServiceConfiguration<?, ?>[serviceConfigs.size()]);
     if (serialization != null) {
       try {
+        // yukms TODO: 创建序列化器
         final Serializer<K> keySer = serialization.createKeySerializer(keyType, config.getClassLoader(), serviceConfigArray);
         lifeCycledList.add(new LifeCycledAdapter() {
           @Override
           public void close() throws Exception {
+            // yukms TODO: 释放序列化器
             serialization.releaseSerializer(keySer);
           }
         });
         keySerializer = keySer;
       } catch (UnsupportedTypeException e) {
+        // yukms TODO: 抛出位置org.ehcache.impl.internal.spi.serialization.DefaultSerializationProvider.getSerializerClassFor
+        // yukms TODO: 不支持的序列化类型。自定义中既没有Class，也没有实例化
         for (ResourceType<?> resource : resourceTypes) {
+          // yukms TODO: 检测如果资源类型中有必须要序列化的则抛出错误
           if (resource.requiresSerialization()) {
             throw new RuntimeException(e);
           }
         }
         LOGGER.debug("Could not create serializers for {}", alias, e);
       }
+      // yukms TODO: 逻辑一致
       try {
         final Serializer<V> valueSer = serialization.createValueSerializer(valueType, config.getClassLoader(), serviceConfigArray);
         lifeCycledList.add(new LifeCycledAdapter() {
@@ -486,6 +511,8 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
       }
     }
 
+    // yukms TODO: 创建Store
+    // yukms TODO: 2021年9月21日 00:04:32
     Collection<ServiceConfiguration<?, ?>> serviceConfigurations = config.getServiceConfigurations();
 
     @SuppressWarnings("unchecked")

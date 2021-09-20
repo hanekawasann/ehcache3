@@ -19,6 +19,7 @@ package org.ehcache.impl.persistence;
 import org.ehcache.CachePersistenceException;
 import org.ehcache.config.CacheConfiguration;
 import org.ehcache.config.ResourceType;
+import org.ehcache.config.SizedResourcePool;
 import org.ehcache.core.spi.service.DiskResourceService;
 import org.ehcache.core.spi.service.FileBasedPersistenceContext;
 import org.ehcache.core.spi.service.LocalPersistenceService;
@@ -46,6 +47,7 @@ public class DefaultDiskResourceService implements DiskResourceService {
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDiskResourceService.class);
   static final String PERSISTENCE_SPACE_OWNER = "file";
 
+  // yukms TODO: 已经创建的持久化空间
   private final ConcurrentMap<String, PersistenceSpace> knownPersistenceSpaces = new ConcurrentHashMap<>();
   private volatile LocalPersistenceService persistenceService;
   private volatile boolean isStarted;
@@ -100,8 +102,10 @@ public class DefaultDiskResourceService implements DiskResourceService {
     if (persistenceService == null) {
       return null;
     }
+    // yukms TODO: 磁盘难道不是持久化？这里不应必然为真吗
     boolean persistent = config.getResourcePools().getPoolForResource(ResourceType.Core.DISK).isPersistent();
     while (true) {
+      // yukms TODO: 循环直到创建成功
       PersistenceSpace persistenceSpace = knownPersistenceSpaces.get(name);
       if (persistenceSpace != null) {
         return persistenceSpace.identifier;
@@ -138,15 +142,19 @@ public class DefaultDiskResourceService implements DiskResourceService {
   }
 
   private PersistenceSpace createSpace(String name, boolean persistent) throws CachePersistenceException {
+    // yukms TODO: 创建并用DefaultPersistenceSpaceIdentifier包装
     DefaultPersistenceSpaceIdentifier persistenceSpaceIdentifier =
         new DefaultPersistenceSpaceIdentifier(persistenceService.createSafeSpaceIdentifier(PERSISTENCE_SPACE_OWNER, name));
     PersistenceSpace persistenceSpace = new PersistenceSpace(persistenceSpaceIdentifier);
     if (knownPersistenceSpaces.putIfAbsent(name, persistenceSpace) == null) {
+      // yukms TODO: 抢占检测
       boolean created = false;
       try {
         if (!persistent) {
+          // yukms TODO: 什么情况下会出现？
           persistenceService.destroySafeSpace(persistenceSpaceIdentifier.persistentSpaceId, true);
         }
+        // yukms TODO: 创建文件夹
         persistenceService.createSafeSpace(persistenceSpaceIdentifier.persistentSpaceId);
         created = true;
       } finally {
@@ -157,6 +165,7 @@ public class DefaultDiskResourceService implements DiskResourceService {
       }
       return persistenceSpace;
     }
+    // yukms TODO: 抢占失败
     return null;
   }
 

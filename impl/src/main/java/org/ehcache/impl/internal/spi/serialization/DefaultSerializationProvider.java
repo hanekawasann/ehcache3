@@ -72,12 +72,16 @@ public class DefaultSerializationProvider implements SerializationProvider {
 
   @Override
   public <T> Serializer<T> createKeySerializer(Class<T> clazz, ClassLoader classLoader, ServiceConfiguration<?, ?>... configs) throws UnsupportedTypeException {
+    // yukms TODO: 获取自定义的序列化器
     DefaultSerializerConfiguration<T> configuration = find(DefaultSerializerConfiguration.Type.KEY, configs);
     Serializer<T> serializer = getUserProvidedSerializer(configuration);
+    // yukms TODO: 为什么存在没有实例化的序列化器
     if (serializer == null) {
       serializer = createSerializer(clazz, classLoader, configuration, configs);
+      // yukms TODO: 放置已经实例化的序列化器
       instantiated.add(serializer);
     }
+    // yukms TODO: 更新提供实例化的计数
     updateProvidedInstanceCounts(serializer);
     return serializer;
   }
@@ -106,6 +110,8 @@ public class DefaultSerializationProvider implements SerializationProvider {
     }
 
     try {
+      // yukms TODO: 为什么必须要有构造函数必须有ClassLoader呢？默认的序列化器都没有用到该参数
+      // yukms TODO: 反射实例化序列化器
       return constructSerializer(clazz, klazz.getConstructor(ClassLoader.class), classLoader);
     } catch (NoSuchMethodException e) {
       throw new RuntimeException(klazz + " does not have a constructor that takes in a ClassLoader.", e);
@@ -114,18 +120,23 @@ public class DefaultSerializationProvider implements SerializationProvider {
 
 
   private <T> Class<? extends Serializer<T>> getSerializerClassFor(Class<T> clazz, DefaultSerializerConfiguration<T> config) throws UnsupportedTypeException {
+    // yukms TODO: 取配置的序列化器
     if (config != null) {
+      // yukms TODO: 有序列化Class却没有实例化场景什么时候出现
       Class<? extends Serializer<T>> configured = config.getClazz();
       if (configured != null) {
         return configured;
       }
     }
 
+    // yukms TODO: 从默认的序列化取
     @SuppressWarnings("unchecked")
     Class<? extends Serializer<T>> direct = (Class<? extends Serializer<T>>) serializers.get(clazz);
     if (direct != null) {
       return direct;
     }
+
+    // yukms TODO: 如果子类也使用，这种不会有问题吗？
     for (Map.Entry<Class<?>, Class<? extends Serializer<?>>> entry : serializers.entrySet()) {
       if (entry.getKey().isAssignableFrom(clazz)) {
         @SuppressWarnings("unchecked")
@@ -149,6 +160,7 @@ public class DefaultSerializationProvider implements SerializationProvider {
   }
 
   private void updateProvidedInstanceCounts(Serializer<?> serializer) {
+    // yukms TODO: 为什么要计数？？
     AtomicInteger currentCount = providedVsCount.putIfAbsent(serializer, new AtomicInteger(1));
     if(currentCount != null) {
       currentCount.incrementAndGet();
@@ -161,6 +173,7 @@ public class DefaultSerializationProvider implements SerializationProvider {
     if(currentCount != null) {
       if(currentCount.decrementAndGet() < 0) {
         currentCount.incrementAndGet();
+        // yukms TODO: “给定的序列化程序不由此提供程序管理”什么场景？
         throw new IllegalArgumentException("Given serializer:" + serializer.getClass().getName() + " is not managed by this provider");
       }
     } else {
@@ -176,6 +189,7 @@ public class DefaultSerializationProvider implements SerializationProvider {
 
   @Override
   public void start(ServiceProvider<Service> serviceProvider) {
+    // yukms TODO: 内置序列化器
     addDefaultSerializerIfNoneRegistered(serializers, Serializable.class, CompactJavaSerializer.<Serializable>asTypedSerializer());
     addDefaultSerializerIfNoneRegistered(serializers, Long.class, LongSerializer.class);
     addDefaultSerializerIfNoneRegistered(serializers, Integer.class, IntegerSerializer.class);

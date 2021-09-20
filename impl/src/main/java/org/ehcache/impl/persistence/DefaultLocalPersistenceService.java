@@ -146,6 +146,7 @@ public class DefaultLocalPersistenceService implements LocalPersistenceService {
     validateName(owner);
     SafeSpace ss = createSafeSpaceLogical(owner, identifier);
 
+    // yukms TODO: 怎么出现这种情况的
     for (File parent = ss.directory.getParentFile(); parent != null; parent = parent.getParentFile()) {
       if (rootDirectory.equals(parent)) {
         return new DefaultSafeSpaceIdentifier(ss);
