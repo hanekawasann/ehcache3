@@ -1631,6 +1631,7 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
 
     @Override
     public int rank(Set<ResourceType<?>> resourceTypes, Collection<ServiceConfiguration<?, ?>> serviceConfigs) {
+      // yukms TODO: 这里的Set.equals是没看明白，ResourceType存在多个岂不是永远都返回false？
       return resourceTypes.equals(Collections.singleton(getResourceType())) ? 1 : 0;
     }
 
@@ -1641,8 +1642,10 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
 
     @Override
     public <K, V> OnHeapStore<K, V> createStore(Configuration<K, V> storeConfig, ServiceConfiguration<?, ?>... serviceConfigs) {
+      // yukms TODO: 创建OnHeapStore
       OnHeapStore<K, V> store = createStoreInternal(storeConfig, new DefaultStoreEventDispatcher<>(storeConfig.getDispatcherConcurrency()), serviceConfigs);
 
+      // yukms TODO: 注册监听
       tierOperationStatistics.put(store, new OperationStatistic<?>[] {
         createTranslatedStatistic(store, "get", TierOperationOutcomes.GET_TRANSLATION, "get"),
         createTranslatedStatistic(store, "eviction", TierOperationOutcomes.EVICTION_TRANSLATION, "eviction") });
@@ -1652,6 +1655,7 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
 
     public <K, V> OnHeapStore<K, V> createStoreInternal(Configuration<K, V> storeConfig, StoreEventDispatcher<K, V> eventDispatcher,
                                                         ServiceConfiguration<?, ?>... serviceConfigs) {
+      // yukms TODO: 都stop了，怎么还能使用
       TimeSource timeSource = getServiceProvider().getService(TimeSourceService.class).getTimeSource();
       CopyProvider copyProvider = getServiceProvider().getService(CopyProvider.class);
       Copier<K> keyCopier  = copyProvider.createKeyCopier(storeConfig.getKeyType(), storeConfig.getKeySerializer(), serviceConfigs);

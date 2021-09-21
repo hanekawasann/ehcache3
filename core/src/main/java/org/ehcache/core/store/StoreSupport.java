@@ -48,6 +48,7 @@ public final class StoreSupport {
             .map(provider -> new Tuple<>(provider.wrapperStoreRank(serviceConfigs), provider))
             .filter(providerTuple -> providerTuple.x != 0)
             .max(Comparator.comparingInt(value -> value.x));
+    // yukms TODO: 取max rank的provider
     return wrapperProvider.map(providerTuple -> providerTuple.y).orElse(null);
   }
 
@@ -79,7 +80,7 @@ public final class StoreSupport {
    */
   public static Store.Provider selectStoreProvider(
       ServiceProvider<Service> serviceProvider, Set<ResourceType<?>> resourceTypes, Collection<ServiceConfiguration<?, ?>> serviceConfigs) {
-
+    // yukms TODO: 获取max rank的Store.Provider
     Collection<Store.Provider> storeProviders = serviceProvider.getServicesOfType(Store.Provider.class);
     List<Store.Provider> filteredStoreProviders = storeProviders.stream().filter(provider -> !(provider instanceof WrapperStore.Provider)).collect(Collectors.toList());
     int highRank = 0;

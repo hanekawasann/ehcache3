@@ -102,7 +102,7 @@ public class DefaultDiskResourceService implements DiskResourceService {
     if (persistenceService == null) {
       return null;
     }
-    // yukms TODO: 磁盘难道不是持久化？这里不应必然为真吗
+    // yukms TODO: 磁盘难道不是持久化？这里不应必然为真吗？需要debug
     boolean persistent = config.getResourcePools().getPoolForResource(ResourceType.Core.DISK).isPersistent();
     while (true) {
       // yukms TODO: 循环直到创建成功
@@ -142,7 +142,7 @@ public class DefaultDiskResourceService implements DiskResourceService {
   }
 
   private PersistenceSpace createSpace(String name, boolean persistent) throws CachePersistenceException {
-    // yukms TODO: 创建并用DefaultPersistenceSpaceIdentifier包装
+    // yukms TODO: 获取文件路径
     DefaultPersistenceSpaceIdentifier persistenceSpaceIdentifier =
         new DefaultPersistenceSpaceIdentifier(persistenceService.createSafeSpaceIdentifier(PERSISTENCE_SPACE_OWNER, name));
     PersistenceSpace persistenceSpace = new PersistenceSpace(persistenceSpaceIdentifier);
@@ -180,6 +180,7 @@ public class DefaultDiskResourceService implements DiskResourceService {
    */
   @Override
   public void destroy(String name) {
+    // yukms TODO: 检测状态
     checkStarted();
 
     if(persistenceService == null) {
@@ -187,6 +188,7 @@ public class DefaultDiskResourceService implements DiskResourceService {
     }
 
     PersistenceSpace space = knownPersistenceSpaces.remove(name);
+    // yukms TODO: space == null就直接返回就是了，为什么没有要创建，然后再销毁呢？
     SafeSpaceIdentifier identifier = (space == null) ?
       persistenceService.createSafeSpaceIdentifier(PERSISTENCE_SPACE_OWNER, name) : space.identifier.persistentSpaceId;
     persistenceService.destroySafeSpace(identifier, true);

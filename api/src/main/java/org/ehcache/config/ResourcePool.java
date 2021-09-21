@@ -31,8 +31,10 @@ public interface ResourcePool {
 
   /**
    * Indicates whether the underlying resource is persistent.
+   * 指示基础资源是否持久。
    * <p>
    * Persistence in this context means that data stored will survive a JVM restart, unless destroyed.
+   * 在这种情况下，持久性意味着存储的数据将在JVM重启后继续存在，除非被销毁。
    *
    * @return {@code true} if persistent, {@code false} otherwise
    */

@@ -33,9 +33,11 @@ public interface ResourceType<T extends ResourcePool> {
 
   /**
    * Indicates whether this {@code ResourceType} supports persistence.
+   * 指示此{@code ResourceType}是否支持持久性。
    * <p>
    * Persistence in this context means that a {@link ResourcePool} of this {@code ResourceType} can be configured
    * so that data stored in it will survive a JVM restart.
+   * 此上下文中的持久性意味着可以配置此{@code ResourceType}的{@link ResourcePool}，以便存储在其中的数据在JVM重新启动后仍然有效。
    *
    * @return {@code true} if it supports persistence, {@code false} otherwise
    */

@@ -206,13 +206,16 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
           configuration.removeCacheConfiguration(alias);
         }
 
+        // yukms TODO: 移除CacheManagerListener
         if (!statusTransitioner.isTransitioning()) {
           for (CacheManagerListener listener : listeners) {
             listener.cacheRemoved(alias, ehcache);
           }
         }
 
+        // yukms TODO: 调用关闭方法
         ehcache.close();
+        // yukms TODO: 清理持久化数据
         closeEhcache(alias, ehcache);
       }
       LOGGER.info("Cache '{}' removed from {}.", alias, simpleName);
@@ -221,7 +224,9 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
 
   /**
    * Perform cache closure actions specific to a cache manager implementation.
+   * 执行特定于缓存管理器实现的缓存关闭操作。
    * This method is called <i>after</i> the {@code InternalCache} instance is closed.
+   * 在关闭{@code InternalCache}实例后，<i>调用此方法。
    *
    * @param alias the cache alias
    * @param ehcache the {@code InternalCache} instance for the cache to close
@@ -232,6 +237,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
         ResourcePool resourcePool = ehcache.getRuntimeConfiguration()
             .getResourcePools()
             .getPoolForResource(resourceType);
+        // yukms TODO: org.ehcache.config.ResourceType.isPersistable与org.ehcache.config.ResourcePool.isPersistent代表的意义不一样，需要debug
         if (!resourcePool.isPersistent()) {
           PersistableResourceService persistableResourceService = getPersistableResourceService(resourceType);
           try {
@@ -278,6 +284,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
     RuntimeException failure = null;
     try {
       cache = createNewEhcache(alias, config, keyType, valueType);
+      // yukms TODO: 初始化
       cache.init();
       if (addToConfig) {
         configuration.addCacheConfiguration(alias, cache.getRuntimeConfiguration());
@@ -294,9 +301,10 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
       }
     }
 
-    // yukms TODO: 通知监听者
+    // yukms TODO: 创建监听
     if(failure == null) {
       try {
+        // yukms TODO: 再次检测
         if(!statusTransitioner.isTransitioning()) {
           for (CacheManagerListener listener : listeners) {
             listener.cacheAdded(alias, cache);
@@ -409,6 +417,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
       evtService.setListenerSource(cache);
     }
 
+    // yukms TODO: 将所有的声明周期钩子放到cache中
     for (LifeCycled lifeCycled : lifeCycledList) {
       cache.addHook(lifeCycled);
     }
@@ -465,7 +474,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
     // yukms TODO: key与value的序列化器
     Serializer<K> keySerializer = null;
     Serializer<V> valueSerializer = null;
-    // yukms TODO: 是不是如果没有使用磁盘等需要序列的话的缓存就不会有SerializationProvider
+    // yukms TODO: 是不是如果没有使用磁盘等需要序列化的缓存就不会有SerializationProvider
     final SerializationProvider serialization = serviceLocator.getService(SerializationProvider.class);
     ServiceConfiguration<?, ?>[] serviceConfigArray = serviceConfigs.toArray(new ServiceConfiguration<?, ?>[serviceConfigs.size()]);
     if (serialization != null) {
@@ -511,15 +520,15 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
       }
     }
 
-    // yukms TODO: 创建Store
-    // yukms TODO: 2021年9月21日 00:04:32
     Collection<ServiceConfiguration<?, ?>> serviceConfigurations = config.getServiceConfigurations();
 
+    // yukms TODO: StoreEventSourceConfiguration
     @SuppressWarnings("unchecked")
     int dispatcherConcurrency = findOptionalAmongst((Class<StoreEventSourceConfiguration<?>>) (Class) StoreEventSourceConfiguration.class, serviceConfigurations)
       .map(StoreEventSourceConfiguration::getDispatcherConcurrency)
       .orElse(StoreEventSourceConfiguration.DEFAULT_DISPATCHER_CONCURRENCY);
 
+    // yukms TODO: StoreStatisticsConfiguration
     boolean operationStatisticsEnabled = findOptionalAmongst(StoreStatisticsConfiguration.class, serviceConfigurations)
       .map(StoreStatisticsConfiguration::isOperationStatisticsEnabled)
       // By default, we enable statistics only in a tiered environment
@@ -528,11 +537,15 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
     Store.Configuration<K, V> storeConfiguration = new StoreConfigurationImpl<>(config, dispatcherConcurrency,
       operationStatisticsEnabled, keySerializer, valueSerializer, loaderWriter, useLoaderInAtomics);
 
+    // yukms TODO: 多层只实例化一层是为什么？
+    // yukms TODO: org.ehcache.core.spi.store.WrapperStore.Provider
     Store.Provider storeProvider = StoreSupport.selectWrapperStoreProvider(serviceLocator, serviceConfigs);
     if (storeProvider == null) {
+      // yukms TODO: org.ehcache.core.spi.store.Store.Provider
       storeProvider = StoreSupport.selectStoreProvider(serviceLocator, resourceTypes, serviceConfigs);
     }
 
+    // yukms TODO: 创建Store
     Store<K, V> store = storeProvider.createStore(storeConfiguration, serviceConfigArray);
 
     AtomicReference<Store.Provider> storeProviderRef = new AtomicReference<>(storeProvider);
@@ -611,6 +624,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
     // yukms TODO: 重点代码
     final StatusTransitioner.Transition st = statusTransitioner.init();
     try {
+      // yukms TODO: 启动每个service
       serviceLocator.startAllServices();
 
       Deque<String> initiatedCaches = new ArrayDeque<>();
@@ -631,6 +645,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
           }
         }
         try {
+          // yukms TODO: 停止每个service（这里stop了全局的serviceLocator，那不是这些service就无法使用了吗？）
           serviceLocator.stopAllServices();
         } catch (Exception exceptionStoppingServices) {
           LOGGER.error("Stopping services after initialization failure failed due to ", exceptionStoppingServices);
@@ -817,6 +832,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
     }
 
     <K, V> InternalCache<K, V> retrieve(Class<K> refKeyType, Class<V> refValueType) {
+      // yukms TODO: 防止cache还没设置完成就被取到
       if (!isValueSet) {
         synchronized (this) {
           boolean interrupted = false;

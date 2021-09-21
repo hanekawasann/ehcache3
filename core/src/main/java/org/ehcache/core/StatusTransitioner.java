@@ -73,7 +73,7 @@ final class StatusTransitioner {
   Transition init() {
     logger.trace("Initializing");
     InternalStatus.Transition st;
-    // yukms TODO: MAINTENANCE -> UNINITIALIZED
+    // yukms TODO: UNINITIALIZED -> AVAILABLE
     for (InternalStatus.Transition cs; !currentState.compareAndSet(cs = currentState.get(), st = cs.get().init()););
     return new Transition(st, null, "Initialize");
   }
@@ -84,6 +84,7 @@ final class StatusTransitioner {
     if(maintenanceLease != null && Thread.currentThread() != maintenanceLease) {
       throw new IllegalStateException("You don't own this MAINTENANCE lease");
     }
+    // yukms TODO: AVAILABLE -> UNINITIALIZED
     for (InternalStatus.Transition cs; !currentState.compareAndSet(cs = currentState.get(), st = cs.get().close()););
     return new Transition(st, null, "Close");
   }
@@ -192,10 +193,12 @@ final class StatusTransitioner {
       try {
         switch(st.to()) {
           case AVAILABLE:
+            // yukms TODO: 启动调用
             runInitHooks();
             break;
           case UNINITIALIZED:
             maintenanceLease = null;
+            // yukms TODO: 关闭调用
             runCloseHooks();
             break;
           case MAINTENANCE:
