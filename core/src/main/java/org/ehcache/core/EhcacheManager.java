@@ -760,6 +760,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
 
   @Override
   public void destroy() throws CachePersistenceException {
+    // yukms TODO: 2021-09-21 22:58:36
     StatusTransitioner.Transition st = statusTransitioner.maintenance();
     try {
       startMaintainableServices(MaintainableService.MaintenanceScope.CACHE_MANAGER);
