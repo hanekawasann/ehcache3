@@ -715,6 +715,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
 
     StatusTransitioner.Transition maintenance = null;
     try {
+      // yukms TODO: 进入维护状态
       maintenance = statusTransitioner.maintenance();
     } catch(IllegalStateException e) {
       // the cache manager is already started, no need to put it in maintenance
@@ -725,7 +726,9 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
 
     if(maintenance != null) {
       try {
+        // yukms TODO: 准备维护
         startMaintainableServices(MaintainableService.MaintenanceScope.CACHE);
+        // yukms TODO: 维护状态进入成功
         maintenance.succeeded();
       } catch (Throwable t) {
         throw maintenance.failed(t);
@@ -733,14 +736,19 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
     }
 
     try {
+      // yukms TODO: 移除缓存
       removeCache(alias, true);
+      // yukms TODO: 清理持久化空间
       destroyPersistenceSpace(alias);
     } finally {
       // if it was started, stop it
       if(maintenance != null) {
+        // yukms TODO: 退出维护状态
         StatusTransitioner.Transition st = statusTransitioner.exitMaintenance();
         try {
+          // yukms TODO: 停止维护
           stopMaintainableServices();
+          // yukms TODO: 退出维护状态成功
           st.succeeded();
         } catch (Throwable t) {
           throw st.failed(t);
@@ -760,18 +768,25 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
 
   @Override
   public void destroy() throws CachePersistenceException {
-    // yukms TODO: 2021-09-21 22:58:36
+    // yukms TODO: 进入维护状态
     StatusTransitioner.Transition st = statusTransitioner.maintenance();
     try {
+      // yukms TODO: 准备维护服务
       startMaintainableServices(MaintainableService.MaintenanceScope.CACHE_MANAGER);
+      // yukms TODO: 进入维护状态成功
       st.succeeded();
     } catch (Throwable t) {
       throw st.failed(t);
     }
+
+    // yukms TODO: 清理所有持久化空间
     destroyInternal();
+    // yukms TODO: 退出维护状态
     st = statusTransitioner.exitMaintenance();
     try {
+      // yukms TODO: 停止维护服务
       stopMaintainableServices();
+      // yukms TODO: 退出维护状态成功
       st.succeeded();
     } catch (Throwable t) {
       throw st.failed(t);
@@ -782,6 +797,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
   private void startMaintainableServices(MaintainableService.MaintenanceScope maintenanceScope) {
     ServiceProvider<MaintainableService> provider = getMaintainableServiceProvider();
     Collection<MaintainableService> services = serviceLocator.getServicesOfType(MaintainableService.class);
+    // yukms TODO: 所有MaintainableService准备维护
     for (MaintainableService service : services) {
       service.startForMaintenance(provider, maintenanceScope);
     }

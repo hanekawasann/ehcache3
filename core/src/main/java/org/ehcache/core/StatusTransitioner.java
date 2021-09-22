@@ -73,6 +73,7 @@ final class StatusTransitioner {
   Transition init() {
     logger.trace("Initializing");
     InternalStatus.Transition st;
+    // yukms TODO: 状态切换需要debug下
     // yukms TODO: UNINITIALIZED -> AVAILABLE
     for (InternalStatus.Transition cs; !currentState.compareAndSet(cs = currentState.get(), st = cs.get().init()););
     return new Transition(st, null, "Initialize");
@@ -92,6 +93,7 @@ final class StatusTransitioner {
   Transition maintenance() {
     logger.trace("Entering Maintenance");
     InternalStatus.Transition st;
+    // yukms TODO: AVAILABLE -> MAINTENANCE？？？
     for (InternalStatus.Transition cs; !currentState.compareAndSet(cs = currentState.get(), st = cs.get().maintenance()););
     return new Transition(st, Thread.currentThread(), "Enter Maintenance");
   }
@@ -100,6 +102,7 @@ final class StatusTransitioner {
     checkMaintenance();
     logger.trace("Exiting Maintenance");
     InternalStatus.Transition st;
+    // yukms TODO: MAINTENANCE -> UNINITIALIZED？？？
     for (InternalStatus.Transition cs; !currentState.compareAndSet(cs = currentState.get(), st = cs.get().close()););
     return new Transition(st, Thread.currentThread(), "Exit Maintenance");
   }
@@ -214,6 +217,7 @@ final class StatusTransitioner {
       }
 
       try {
+        // yukms TODO: 状态转换，通知监听器
         fireTransitionEvent(st.from().toPublicStatus(), st.to().toPublicStatus());
       } finally {
         maintenanceLease = thread;

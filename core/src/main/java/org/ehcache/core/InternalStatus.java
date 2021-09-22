@@ -124,14 +124,16 @@ enum InternalStatus {
     }
 
     public synchronized void succeeded() {
-      // yukms TODO: 切换状态
+      // yukms TODO: 切换到to状态
       done = to;
       // yukms TODO: 唤醒其他等待的线程
       notifyAll();
     }
 
     public synchronized void failed() {
+      // yukms TODO: from与to取order小的？
       done = to.compareTo(from()) > 0 ? from() : to;
+      // yukms TODO: 唤醒其他等待的线程
       notifyAll();
     }
 
@@ -149,7 +151,8 @@ enum InternalStatus {
   }
 
   public static Transition initial() {
-    // yukms TODO: 类似于状态机、
+    // yukms TODO: 类似于状态机
+    // yukms TODO: MAINTENANCE -> UNINITIALIZED
     final Transition close = MAINTENANCE.close();
     close.succeeded();
     return close;
