@@ -207,6 +207,7 @@ public class CacheManagerBuilder<T extends CacheManager> implements Builder<T> {
    * @return a new builder with the added default copier
    */
   public <C> CacheManagerBuilder<T> withCopier(Class<C> clazz, Class<? extends Copier<C>> copier) {
+    // yukms TODO: DefaultCopyProviderConfiguration
     return ensureThenUpdate(DefaultCopyProviderConfiguration::new, existing -> existing.addCopierFor(clazz, copier, true));
   }
 
@@ -219,6 +220,7 @@ public class CacheManagerBuilder<T extends CacheManager> implements Builder<T> {
    * @return a new builder with the added default serializer
    */
   public <C> CacheManagerBuilder<T> withSerializer(Class<C> clazz, Class<? extends Serializer<C>> serializer) {
+    // yukms TODO: DefaultSerializationProviderConfiguration
     return ensureThenUpdate(DefaultSerializationProviderConfiguration::new, config -> config.addSerializerFor(clazz, serializer, true));
   }
 
@@ -230,6 +232,7 @@ public class CacheManagerBuilder<T extends CacheManager> implements Builder<T> {
    * @return a new builder with the added configuration
    */
   public CacheManagerBuilder<T> withDefaultSizeOfMaxObjectGraph(long size) {
+    // yukms TODO: DefaultSizeOfEngineProviderConfiguration
     return ensureThenUpdate(
       () -> new DefaultSizeOfEngineProviderConfiguration(DEFAULT_MAX_OBJECT_SIZE, DEFAULT_UNIT, DEFAULT_OBJECT_GRAPH_SIZE),
       existing -> new DefaultSizeOfEngineProviderConfiguration(existing.getMaxObjectSize(), existing.getUnit(), size)
@@ -260,6 +263,7 @@ public class CacheManagerBuilder<T extends CacheManager> implements Builder<T> {
    * @see PooledExecutionServiceConfigurationBuilder
    */
   public CacheManagerBuilder<T> withDefaultWriteBehindThreadPool(String threadPoolAlias) {
+    // yukms TODO: WriteBehindProviderConfiguration
     return using(new WriteBehindProviderConfiguration(threadPoolAlias));
   }
 
@@ -273,6 +277,7 @@ public class CacheManagerBuilder<T extends CacheManager> implements Builder<T> {
    * @see PooledExecutionServiceConfigurationBuilder
    */
   public CacheManagerBuilder<T> withDefaultDiskStoreThreadPool(String threadPoolAlias) {
+    // yukms TODO: OffHeapDiskStoreProviderConfiguration
     return using(new OffHeapDiskStoreProviderConfiguration(threadPoolAlias));
   }
 
@@ -286,6 +291,7 @@ public class CacheManagerBuilder<T extends CacheManager> implements Builder<T> {
    * @see PooledExecutionServiceConfigurationBuilder
    */
   public CacheManagerBuilder<T> withDefaultEventListenersThreadPool(String threadPoolAlias) {
+    // yukms TODO: CacheEventDispatcherFactoryConfiguration
     return using(new CacheEventDispatcherFactoryConfiguration(threadPoolAlias));
   }
 
@@ -335,6 +341,7 @@ public class CacheManagerBuilder<T extends CacheManager> implements Builder<T> {
 
     FluentConfigurationBuilder<?> fluentBuilder = configBuilder;
     if (configBuilder.getService(configType) == null) {
+      // yukms TODO: 不存在配置
       fluentBuilder = fluentBuilder.withService(emptyConfig);
     }
 

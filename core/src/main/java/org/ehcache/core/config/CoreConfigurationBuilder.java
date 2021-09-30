@@ -150,14 +150,17 @@ public class CoreConfigurationBuilder<B extends CoreConfigurationBuilder<B>> imp
     Collection<? extends ServiceCreationConfiguration<?, R>> existing = getServices(clazz);
 
     if (existing.isEmpty()) {
+      // yukms TODO: 要么是刚设置的配置，要么是替换，这里一定不为空
       throw new IllegalStateException("Cannot updates service configurations. No services exist");
     } else {
       B otherBuilder = withoutServices(clazz);
       for (ServiceCreationConfiguration<?, R> configuration : existing) {
+        // yukms TODO: 替换后的配置
         ServiceCreationConfiguration<?, ?> replacement = configuration.build(update.apply(configuration.derive()));
         if (replacement == null) {
           throw new NullPointerException(configuration.getClass().getSimpleName() + ".build(...) returned a null configuration instance");
         } else {
+          // yukms TODO: 将替换后的配置重新设置进去
           otherBuilder = otherBuilder.withService(replacement);
         }
       }
