@@ -69,23 +69,28 @@ public class ResourcePoolsImpl implements ResourcePools, HumanReadable {
     Set<ResourceType<?>> resourceTypeSet = toBeUpdated.getResourceTypeSet();
 
     // Ensure update pool types already exist in existing pools
+    // yukms TODO: 是否已经存在
     if(!getResourceTypeSet().containsAll(resourceTypeSet)) {
       throw new IllegalArgumentException("Pools to be updated cannot contain previously undefined resources pools");
     }
     // Can not update OFFHEAP
+    // yukms TODO: 堆外不能修改
     if(resourceTypeSet.contains(ResourceType.Core.OFFHEAP)) {
       throw new UnsupportedOperationException("Updating OFFHEAP resource is not supported");
     }
     // Can not update DISK
+    // yukms TODO: 磁盘不能修改
     if(resourceTypeSet.contains(ResourceType.Core.DISK)) {
       throw new UnsupportedOperationException("Updating DISK resource is not supported");
     }
+    // yukms TODO: 资源本身修改校验
     for(ResourceType<?> currentResourceType : resourceTypeSet) {
       getPoolForResource(currentResourceType).validateUpdate(toBeUpdated.getPoolForResource(currentResourceType));
     }
 
     Map<ResourceType<?>, ResourcePool> poolsMap = new HashMap<>(pools.size() + resourceTypeSet.size());
     poolsMap.putAll(pools);
+    // yukms TODO: 逐个替换
     for(ResourceType<?> currentResourceType : resourceTypeSet) {
       ResourcePool poolForResource = toBeUpdated.getPoolForResource(currentResourceType);
       poolsMap.put(currentResourceType, poolForResource);
@@ -101,11 +106,13 @@ public class ResourcePoolsImpl implements ResourcePools, HumanReadable {
    */
   public static void validateResourcePools(Collection<? extends ResourcePool> pools) {
     List<SizedResourcePool> ordered = new ArrayList<>(pools.size());
+    // yukms TODO: 只比较SizedResourcePool
     for(ResourcePool pool : pools) {
       if (pool instanceof SizedResourcePool) {
         ordered.add((SizedResourcePool)pool);
       }
     }
+    // yukms TODO: 层高排序
     ordered.sort((o1, o2) -> {
       int retVal = o2.getType().getTierHeight() - o1.getType().getTierHeight();
       if (retVal == 0) {
@@ -115,6 +122,7 @@ public class ResourcePoolsImpl implements ResourcePools, HumanReadable {
       }
     });
 
+    // yukms TODO: 上层与下层逐个比较
     for (int i = 0; i < ordered.size(); i++) {
       for (int j = 0; j < i; j++) {
         SizedResourcePool upper = ordered.get(j);
@@ -123,7 +131,9 @@ public class ResourcePoolsImpl implements ResourcePools, HumanReadable {
         boolean inversion;
         boolean ambiguity;
         try {
+          // yukms TODO: 层级不能相同
           ambiguity = upper.getType().getTierHeight() == lower.getType().getTierHeight();
+          // yukms TODO: 上层大小不能大于等于下层
           inversion = (upper.getUnit().compareTo(upper.getSize(), lower.getSize(), lower.getUnit()) >= 0)
                       || (lower.getUnit().compareTo(lower.getSize(), upper.getSize(), upper.getUnit()) <= 0);
         } catch (IllegalArgumentException e) {

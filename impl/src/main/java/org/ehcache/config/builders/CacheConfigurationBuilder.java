@@ -114,7 +114,7 @@ public class CacheConfigurationBuilder<K, V> implements FluentCacheConfiguration
    * @param <V> the value type
    * @return a {@code CacheConfigurationBuilder}
    */
-  public static <K, V> CacheConfigurationBuilder<K, V> newCacheConfigurationBuilder(CacheConfiguration<K, V> configuration) {
+  public static <K, V> CacheConfigurationBuilder<K, V>  newCacheConfigurationBuilder(CacheConfiguration<K, V> configuration) {
     CacheConfigurationBuilder<K, V> builder = newCacheConfigurationBuilder(configuration.getKeyType(), configuration.getValueType(), configuration.getResourcePools())
       .withEvictionAdvisor(configuration.getEvictionAdvisor())
       .withExpiry(configuration.getExpiryPolicy());
@@ -154,11 +154,13 @@ public class CacheConfigurationBuilder<K, V> implements FluentCacheConfiguration
   @Deprecated
   public CacheConfigurationBuilder<K, V> add(ServiceConfiguration<?, ?> configuration) {
     if (!getServices(configuration.getClass()).isEmpty()) {
+      // yukms TODO: 除了以下几个cache独用service，其他通用service不可重复
       if (configuration instanceof DefaultCopierConfiguration<?>
         || configuration instanceof DefaultSerializerConfiguration<?>
         || configuration instanceof DefaultCacheEventListenerConfiguration) {
         return withService(configuration);
       } else {
+        // yukms TODO: “当已存在另一个通用服务配置时，无法添加该配置。”+“请依赖特定的with方法，或确保先删除其他配置。”
         throw new IllegalStateException("Cannot add a generic service configuration when another one already exists. " +
           "Rely on specific with* methods or make sure your remove other configuration first.");
       }
@@ -383,11 +385,13 @@ public class CacheConfigurationBuilder<K, V> implements FluentCacheConfiguration
 
   @Override
   public CacheConfigurationBuilder<K, V> withKeySerializingCopier() {
+    // yukms TODO: ？？？
     return withKeyCopier(SerializingCopier.asCopierClass());
   }
 
   @Override
   public CacheConfigurationBuilder<K, V> withValueSerializingCopier() {
+    // yukms TODO: ？？？
     return withValueCopier(SerializingCopier.asCopierClass());
   }
 
@@ -398,6 +402,7 @@ public class CacheConfigurationBuilder<K, V> implements FluentCacheConfiguration
 
   @Override
   public CacheConfigurationBuilder<K, V> withKeyCopier(Class<? extends Copier<K>> keyCopierClass) {
+    // yukms TODO: ？？？
     return withService(new DefaultCopierConfiguration<>(requireNonNull(keyCopierClass, "Null key copier class"), DefaultCopierConfiguration.Type.KEY));
   }
 

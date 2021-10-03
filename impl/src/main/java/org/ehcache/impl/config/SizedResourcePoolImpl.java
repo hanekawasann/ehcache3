@@ -83,6 +83,7 @@ public class SizedResourcePoolImpl<P extends SizedResourcePool> extends Abstract
 
     SizedResourcePool sizedPool = (SizedResourcePool)newPool;
     // Ensure unit type has not changed
+    // yukms TODO: 单位不能修改
     if (!this.getUnit().getClass().equals(sizedPool.getUnit().getClass())) {
       throw new IllegalArgumentException("ResourcePool for " + sizedPool.getType() + " with ResourceUnit '"
           + sizedPool.getUnit() + "' can not replace '" + this.getUnit() + "'");

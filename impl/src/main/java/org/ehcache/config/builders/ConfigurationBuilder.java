@@ -32,7 +32,7 @@ import java.util.function.Predicate;
  *
  * @author Alex Snaps
  */
-public final class ConfigurationBuilder extends CoreConfigurationBuilder<ConfigurationBuilder> {
+public final class  ConfigurationBuilder extends CoreConfigurationBuilder<ConfigurationBuilder> {
 
   /**
    * Create a new 'empty' configuration builder.

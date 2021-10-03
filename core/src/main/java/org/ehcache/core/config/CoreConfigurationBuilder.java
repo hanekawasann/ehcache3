@@ -132,7 +132,9 @@ public class CoreConfigurationBuilder<B extends CoreConfigurationBuilder<B>> imp
   @Override
   public B withService(ServiceCreationConfiguration<?, ?> config) {
     List<ServiceCreationConfiguration<?, ?>> newServiceConfigurations = new ArrayList<>(serviceConfigurations);
+    // yukms TODO: 移除不兼容的配置
     newServiceConfigurations.removeIf(other -> !other.compatibleWith(config) || !config.compatibleWith(other));
+    // yukms TODO: 添加新配置
     newServiceConfigurations.add(config);
     return newBuilderWith(newServiceConfigurations);
   }
