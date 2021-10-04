@@ -136,13 +136,28 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
   }
 
   private ServiceLocator resolveServices(UnaryOperator<ServiceLocator.DependencySet> customization) {
+    // yukms TODO: 默认需要的service
     ServiceLocator.DependencySet builder = dependencySet()
       .with(Store.Provider.class)
-      .with(CacheLoaderWriterProvider.class)
-      .with(WriteBehindProvider.class)
-      .with(CacheEventDispatcherFactory.class)
-      .with(CacheEventListenerProvider.class)
-      .with(ResilienceStrategyProvider.class);
+      // yukms TODO: OnHeapStoreProviderFactory
+      // yukms TODO: OffHeapStoreProviderFactory
+      // yukms TODO: OffHeapDiskStoreProviderFactory
+      // yukms TODO: TieredStoreProviderFactory
+      // yukms TODO: LoaderWriterStoreProviderFactory
+
+      // yukms TODO: TimeSourceService TimeSourceServiceFactory
+      // yukms TODO: CopyProvider DefaultCopyProviderFactory
+      // yukms TODO: SizeOfEngineProvider DefaultSizeOfEngineProviderFactory
+      // yukms TODO: StatisticsService DefaultStatisticsServiceFactory
+      // yukms TODO: SerializationProvider DefaultSerializationProviderFactory
+      // yukms TODO: DiskResourceService DefaultDiskResourceServiceFactory
+      // yukms TODO: CachingTier.Provider CompoundCachingTierProviderFactory
+      .with(CacheLoaderWriterProvider.class)// yukms TODO: DefaultCacheLoaderWriterProviderFactory
+      .with(WriteBehindProvider.class)// yukms TODO: WriteBehindProviderFactory
+      .with(CacheEventDispatcherFactory.class)// yukms TODO: CacheEventNotificationListenerServiceProviderFactory
+      .with(CacheEventListenerProvider.class)// yukms TODO: DefaultCacheEventListenerProviderFactory
+      .with(ResilienceStrategyProvider.class);// yukms TODO: DefaultResilienceStrategyProviderFactory
+    // yukms TODO: ExecutionService DefaultExecutionServiceFactory
 
     // yukms TODO: builder.with(services)
     builder = customization.apply(builder);

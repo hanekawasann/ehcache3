@@ -232,6 +232,25 @@ public final class ServiceLocator implements ServiceProvider<Service> {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     // yukms TODO: spi org.ehcache.core.spi.service.ServiceFactory = org.ehcache.core.internal.statistics.DefaultStatisticsServiceFactory
+    //org.ehcache.impl.internal.store.heap.OnHeapStoreProviderFactory
+    //org.ehcache.impl.internal.store.offheap.OffHeapStoreProviderFactory
+    //org.ehcache.impl.internal.store.disk.OffHeapDiskStoreProviderFactory
+    //org.ehcache.impl.internal.store.tiering.TieredStoreProviderFactory
+    //org.ehcache.impl.internal.store.tiering.CompoundCachingTierProviderFactory
+    //org.ehcache.impl.internal.store.loaderwriter.LoaderWriterStoreProviderFactory
+    //org.ehcache.impl.internal.TimeSourceServiceFactory
+    //org.ehcache.impl.internal.spi.serialization.DefaultSerializationProviderFactory
+    //org.ehcache.impl.internal.spi.loaderwriter.DefaultCacheLoaderWriterProviderFactory
+    //org.ehcache.impl.internal.spi.event.DefaultCacheEventListenerProviderFactory
+    //org.ehcache.impl.internal.executor.DefaultExecutionServiceFactory
+    //org.ehcache.impl.internal.persistence.DefaultLocalPersistenceServiceFactory
+    //org.ehcache.impl.internal.persistence.DefaultDiskResourceServiceFactory
+    //org.ehcache.impl.internal.loaderwriter.writebehind.WriteBehindProviderFactory
+    //org.ehcache.impl.internal.events.CacheEventNotificationListenerServiceProviderFactory
+    //org.ehcache.impl.internal.spi.copy.DefaultCopyProviderFactory
+    //org.ehcache.impl.internal.sizeof.DefaultSizeOfEngineProviderFactory
+    //org.ehcache.impl.internal.spi.resilience.DefaultResilienceStrategyProviderFactory
+    //org.ehcache.core.internal.statistics.DefaultStatisticsServiceFactory
     private final Iterable<ServiceFactory<?>> serviceFactories = (Iterable) servicesOfType(ServiceFactory.class);
 
     // yukms TODO: 已经实例化的service
@@ -319,7 +338,7 @@ public final class ServiceLocator implements ServiceProvider<Service> {
       try {
         ServiceMap resolvedServices = new ServiceMap();
 
-        // yukms TODO: 查找已经实例话的service的依赖且放入resolvedServices
+        // yukms TODO: 查找已经实例化的service的依赖且放入resolvedServices
         for (Service service : provided.all()) {
           resolvedServices = lookupDependenciesOf(resolvedServices, service.getClass()).add(service);
         }
@@ -327,6 +346,7 @@ public final class ServiceLocator implements ServiceProvider<Service> {
         // yukms TODO: 查找requested依赖并且放入resolvedServices
         for (Class<? extends Service> request : requested) {
           if (request.isAnnotationPresent(PluralService.class)) {
+            // yukms TODO: 多次注册
             try {
               resolvedServices = lookupService(resolvedServices, request);
             } catch (DependencyException e) {
@@ -335,6 +355,7 @@ public final class ServiceLocator implements ServiceProvider<Service> {
               }
             }
           } else if (!resolvedServices.contains(request)) {
+            // yukms TODO: 单次注册，已存在则跳过
             resolvedServices = lookupService(resolvedServices, request);
           }
         }
@@ -362,6 +383,7 @@ public final class ServiceLocator implements ServiceProvider<Service> {
     }
 
     ServiceMap lookupDependenciesOf(ServiceMap resolved, Class<? extends Service> requested) throws DependencyException {
+      // yukms TODO: 查找需要的依赖项Class
       for (Class<? extends Service> dependency : identifyImmediateDependenciesOf(requested)) {
         try {
           resolved = lookupService(resolved, dependency);
@@ -378,20 +400,20 @@ public final class ServiceLocator implements ServiceProvider<Service> {
     }
 
     private <T extends Service> ServiceMap lookupService(ServiceMap resolved, Class<T> requested) throws DependencyException {
-      // yukms TODO: 已处理
+      // yukms TODO: 已添加的依赖项
       //Have we already resolved this dependency?
       if (resolved.contains(requested) && !requested.isAnnotationPresent(PluralService.class)) {
         return resolved;
       }
 
-      // yukms TODO: provided
+      // yukms TODO: provided中是否已经提供该依赖
       //Attempt resolution from the provided services
       resolved = new ServiceMap(resolved).addAll(provided.get(requested));
       if (resolved.contains(requested) && !requested.isAnnotationPresent(PluralService.class)) {
         return resolved;
       }
 
-      // yukms TODO: ServiceFactory
+      // yukms TODO: serviceFactories中是否存在可以生成该依赖的工厂
       Collection<ServiceFactory<? extends T>> serviceFactories = discoverServices(resolved, requested);
       if (serviceFactories.size() > 1 && !requested.isAnnotationPresent(PluralService.class)) {
         throw new DependencyException("Multiple factories for non-plural service");
@@ -399,6 +421,7 @@ public final class ServiceLocator implements ServiceProvider<Service> {
       for(ServiceFactory<? extends T> factory : serviceFactories) {
         if (!resolved.contains(factory.getServiceType())) {
           try {
+            // yukms TODO: 处理工厂创建的service的依赖
             resolved = lookupDependenciesOf(resolved, factory.getServiceType());
           } catch (DependencyException e) {
             continue;
@@ -407,13 +430,13 @@ public final class ServiceLocator implements ServiceProvider<Service> {
           // yukms TODO: 创建依赖
           T service = factory.create(null);
 
-          // yukms TODO: 这里说明了复制的原因
+          // yukms TODO: 我们复制服务映射，这样，如果上游依赖项解析失败，我们就不会污染真正解析的集合
           //we copy the service map so that if upstream dependency resolution fails we don't pollute the real resolved set
           resolved = new ServiceMap(resolved).add(service);
         }
       }
 
-      // yukms TODO: 检测是否创建到依赖
+      // yukms TODO: 检测是否解决了依赖问题
       if (resolved.contains(requested)) {
         return resolved;
       } else {
@@ -469,7 +492,7 @@ public final class ServiceLocator implements ServiceProvider<Service> {
       return emptySet();
     }
 
-    // yukms TODO: 依赖
+    // yukms TODO: 强依赖
     Set<Class<? extends Service>> dependencies = new HashSet<>();
     ServiceDependencies annotation = clazz.getAnnotation(ServiceDependencies.class);
     if (annotation != null) {
@@ -586,7 +609,9 @@ public final class ServiceLocator implements ServiceProvider<Service> {
     public ServiceMap add(Service service) {
       Set<Class<? extends Service>> serviceClazzes = new HashSet<>();
 
+      // yukms TODO: service本身
       serviceClazzes.add(service.getClass());
+      // yukms TODO: 将该service的所有service的子接口
       for (Class<?> i : getAllInterfaces(service.getClass())) {
         if (Service.class != i && Service.class.isAssignableFrom(i)) {
 
@@ -602,23 +627,32 @@ public final class ServiceLocator implements ServiceProvider<Service> {
        * the Service subtype is annotated with @PluralService, permit multiple registrations;
        * otherwise, fail the registration,
        */
+      // yukms TODO: 在其实现的所有服务子类型下注册具体服务。如果服务子类型用@PluralService注释，则允许多次注册；否则，注册失败，
       for (Class<? extends Service> serviceClazz : serviceClazzes) {
         if (serviceClazz.isAnnotationPresent(PluralService.class)) {
           // Permit multiple registrations
+          // yukms TODO: 允许多次注册
           Set<Service> registeredServices = services.get(serviceClazz);
           if (registeredServices == null) {
+            // yukms TODO: 第一次放入，初始化集合
             registeredServices = new LinkedHashSet<>();
             services.put(serviceClazz, registeredServices);
           }
+          // yukms TODO: 注册
           registeredServices.add(service);
         } else {
           // Only a single registration permitted
+          // yukms TODO: 仅许一次注册
           Set<Service> registeredServices = services.get(serviceClazz);
           if (registeredServices == null || registeredServices.isEmpty()) {
+            // yukms TODO: 注册
             services.put(serviceClazz, singleton(service));
           } else if (!registeredServices.contains(service)) {
+            // yukms TODO: 已经存在该service实现类，且不是当前注册的service，则会报错，如果是重复注册会跳过
+            // yukms TODO: 构建错误信息
             final StringBuilder message = new StringBuilder("Duplicate service implementation(s) found for ")
               .append(service.getClass());
+            // yukms TODO: 构建错误信息
             for (Class<? extends Service> serviceClass : serviceClazzes) {
               if (!serviceClass.isAnnotationPresent(PluralService.class)) {
                 Set<Service> s = this.services.get(serviceClass);
@@ -634,6 +668,7 @@ public final class ServiceLocator implements ServiceProvider<Service> {
             }
             throw new IllegalStateException(message.toString());
           }
+          // yukms TODO: 注册成功
         }
       }
       return this;
