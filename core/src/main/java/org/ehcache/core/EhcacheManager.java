@@ -31,6 +31,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.UnaryOperator;
 
+import javax.naming.ldap.Rdn;
+
 import static org.ehcache.core.spi.ServiceLocator.dependencySet;
 import static org.ehcache.core.spi.service.ServiceUtils.findOptionalAmongst;
 import static org.ehcache.core.spi.service.ServiceUtils.findSingletonAmongst;
@@ -642,6 +644,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
       // yukms TODO: 启动每个service
       serviceLocator.startAllServices();
 
+      // yukms TODO: 提前创建缓存
       Deque<String> initiatedCaches = new ArrayDeque<>();
       try {
         for (Map.Entry<String, CacheConfiguration<?, ?>> cacheConfigurationEntry : configuration.getCacheConfigurations()
