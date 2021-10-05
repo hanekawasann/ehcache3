@@ -93,7 +93,7 @@ final class StatusTransitioner {
   Transition maintenance() {
     logger.trace("Entering Maintenance");
     InternalStatus.Transition st;
-    // yukms TODO: AVAILABLE -> MAINTENANCE？？？
+    // yukms TODO: UNINITIALIZED -> MAINTENANCE
     for (InternalStatus.Transition cs; !currentState.compareAndSet(cs = currentState.get(), st = cs.get().maintenance()););
     return new Transition(st, Thread.currentThread(), "Enter Maintenance");
   }
@@ -102,7 +102,7 @@ final class StatusTransitioner {
     checkMaintenance();
     logger.trace("Exiting Maintenance");
     InternalStatus.Transition st;
-    // yukms TODO: MAINTENANCE -> UNINITIALIZED？？？
+    // yukms TODO: MAINTENANCE -> UNINITIALIZED
     for (InternalStatus.Transition cs; !currentState.compareAndSet(cs = currentState.get(), st = cs.get().close()););
     return new Transition(st, Thread.currentThread(), "Exit Maintenance");
   }

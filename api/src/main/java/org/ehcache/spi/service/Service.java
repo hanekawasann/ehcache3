@@ -28,11 +28,14 @@ public interface Service {
 
   /**
    * Start this service using the provided configuration and {@link ServiceProvider}.
+   * 使用提供的配置和{@link ServiceProvider}启动此服务。
    * <p>
    * The service provider allows a service to retrieve and use other services.
+   * 服务提供者允许服务检索和使用其他服务。
    * <p>
    * A {@code Service} retrieved at this stage may not yet be started. The recommended usage pattern therefore, is to keep a
    * reference to the dependent {@code Service} but use it only when specific methods are invoked on subtypes.
+   * 在此阶段检索到的{@code Service}可能尚未启动。因此，建议的使用模式是保留对依赖{@code Service}的引用，但仅在对子类型调用特定方法时使用它。
    *
    * @param serviceProvider the service provider
    */

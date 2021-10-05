@@ -23,9 +23,11 @@ public interface PersistentCacheManager extends CacheManager {
 
   /**
    * Destroys all persistent data associated with this {@code PersistentCacheManager}.
+   * 销毁与此{@code PersistentCacheManager}关联的所有持久数据。
    * <p>
    * This is achieved by putting the {@code CacheManager} in {@link Status#MAINTENANCE MAINTENANCE} mode,
    * executing the destroy and then exiting the {@code MAINTENANCE} mode.
+   * 这是通过将{@code CacheManager}置于{@link Status MAINTENANCE}模式，执行销毁，然后退出{@code MAINTENANCE}模式来实现的。
    *
    * @throws IllegalStateException if state maintenance couldn't be reached
    * @throws CachePersistenceException when something goes wrong destroying the persistent data

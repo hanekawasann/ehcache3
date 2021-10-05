@@ -670,7 +670,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
         }
         throw e;
       }
-      // yukms TODO: UNINITIALIZED -> AVAILABLE
+      // yukms TODO: UNINITIALIZED -> AVAILABLE完成
       st.succeeded();
     } catch (Exception e) {
       throw st.failed(e);
@@ -739,6 +739,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
       // the cache manager is already started, no need to put it in maintenance
       // however, we need to check that some other thread ISN'T in maintenance
       // Note that right after the check, there is a window for someone to go in maintenance
+      // yukms TODO: 如果不先调用close方法那么会报错，但是依旧能
       statusTransitioner.checkAvailable();
     }
 

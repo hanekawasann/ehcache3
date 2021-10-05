@@ -99,12 +99,15 @@ public interface CacheManager extends Closeable {
 
   /**
    * Transitions this {@code CacheManager} to {@link Status#UNINITIALIZED UNINITIALIZED}.
+   * 将此{@code CacheManager}转换为{@link Status UNINITIALIZED UNINITIALIZED}。
    * <p>
    * This will close all {@link Cache}s known to this {@code CacheManager} and stop all
    * {@link org.ehcache.spi.service.Service Service}s managed by this {@code CacheManager}.
+   * 这将关闭此{@code CacheManager}已知的所有{@link Cache}，并停止由此{@code CacheManager}管理的所有{@link org.ehcache.spi.service.Service service}。
    * <p>
    * Failure to close any {@code Cache} or to stop any {@code Service} will not prevent others from being closed or
    * stopped.
+   * 未能关闭任何{@code Cache}或停止任何{@code Service}不会阻止关闭或停止其他服务。
    *
    * @throws StateTransitionException if the {@code CacheManager} could not reach {@code UNINITIALIZED} cleanly
    * @throws IllegalStateException if the {@code CacheManager} is not {@code AVAILABLE}
