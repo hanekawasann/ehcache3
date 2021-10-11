@@ -359,7 +359,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
     CacheLoaderWriterProvider cacheLoaderWriterProvider = serviceLocator.getService(CacheLoaderWriterProvider.class);
     CacheLoaderWriter<? super K, V> loaderWriter;
     if(cacheLoaderWriterProvider != null) {
-      // yukms TODO: 创建CacheLoaderWriter
+      // yukms TODO: 创建CacheLoaderWriter，默认是没有配置的，所以这里创建结果为null
       loaderWriter = cacheLoaderWriterProvider.createCacheLoaderWriter(alias, config);
 
       if (loaderWriter != null) {
@@ -594,6 +594,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
 
   /**
    *  adjusts the config to reflect new classloader & serialization provider
+   *  调整配置以反映新的类加载器和序列化提供程序
    */
   private <K, V> CacheConfiguration<K, V> adjustConfigurationWithCacheManagerDefaults(String alias, CacheConfiguration<K, V> config) {
     // yukms TODO: classloader
@@ -601,15 +602,19 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
       config = config.derive().withClassLoader(cacheManagerClassLoader).build();
     }
 
-    // yukms TODO: serialization provider
-    // yukms TODO: 没看明白
+    // yukms TODO: serialization provider？？？
+    // yukms TODO: 查询当前缓存的配置
     CacheLoaderWriterConfiguration<?> loaderWriterConfiguration = findSingletonAmongst(CacheLoaderWriterConfiguration.class, config.getServiceConfigurations());
+    // yukms TODO: 当前缓存没有该配置
     if (loaderWriterConfiguration == null) {
+      // yukms TODO: 查询上一个缓存的配置
       CacheLoaderWriterProvider loaderWriterProvider = serviceLocator.getService(CacheLoaderWriterProvider.class);
       CacheLoaderWriterConfiguration<?> preConfiguredCacheLoaderWriterConfig = loaderWriterProvider.getPreConfiguredCacheLoaderWriterConfig(alias);
       if (preConfiguredCacheLoaderWriterConfig != null) {
+        // yukms TODO: 上一个缓存的配置则复制该配置
         config = config.derive().withService(preConfiguredCacheLoaderWriterConfig).build();
       }
+      // yukms TODO: jsr？？？
       if (loaderWriterProvider.isLoaderJsrProvided(alias)) {
         config = config.derive().withService(new CacheLoaderWriterConfiguration<Void>() {}).build();
       }

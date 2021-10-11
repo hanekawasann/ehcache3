@@ -21,13 +21,16 @@ import org.ehcache.spi.service.Service;
 
 /**
  * A {@link Service} that creates {@link CacheLoaderWriter} instances.
+ * 创建{@link CacheLoaderWriter}实例的{@link Service}。
  * <p>
  * A {@code CacheManager} will use the {@link #createCacheLoaderWriter(java.lang.String, org.ehcache.config.CacheConfiguration)}
  * method to create {@code CacheLoaderWriter} instances for each {@code Cache} it
  * manages.
+ * {@code CacheManager}将使用{@link #createCacheLoaderWriter(java.lang.String,org.ehcache.config.CacheConfiguration)}方法为其管理的每个{@code CacheLoaderWriter}创建{@code CacheLoaderWriter}实例。
  * <p>
  * For any non {@code null} value returned, the {@code Cache} will be configured to use the
  * {@code CacheLoaderWriter} instance returned.
+ * 对于返回的任何非{@code null}值，{@code Cache}将配置为使用返回的{@code CacheLoaderWriter}实例。
  */
 public interface CacheLoaderWriterProvider extends Service {
 
@@ -69,6 +72,7 @@ public interface CacheLoaderWriterProvider extends Service {
 
   /**
    * Checks whether  {@link org.ehcache.spi.loaderwriter.CacheLoaderWriter} was provided using jsr api
+   * 检查是否使用jsr api提供了{@link org.ehcache.spi.loaderwriter.CacheLoaderWriter}
    *
    * @param alias the {@code Cache} alias in the {@code CacheManager}
    * @return {@code true} if {@code CacheLoaderWriter} was provided using jsr api, otherwise false.

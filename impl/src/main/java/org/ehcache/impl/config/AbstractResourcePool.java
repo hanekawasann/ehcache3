@@ -27,6 +27,7 @@ import org.ehcache.config.ResourceType;
  */
 public abstract class AbstractResourcePool<P extends ResourcePool, T extends ResourceType<P>> implements ResourcePool {
   private final T type;
+  // yukms TODO: 这与ResourceType的persistent不同
   private final boolean persistent;
 
   /**
