@@ -19,16 +19,22 @@ import java.nio.ByteBuffer;
 
 /**
  * Defines the contract used to transform type instances to and from a serial form.
+ * 定义用于将类型实例转换为串行表单和从串行表单转换为串行表单的约定。
  * <p>
  * Implementations must be thread-safe.
+ * 实现必须是线程安全的。
  * <p>
  * When used within the default serialization provider, there is an additional requirement.
  * The implementations must define a constructor that takes in a {@code ClassLoader}.
  * The {@code ClassLoader} value may be {@code null}.  If not {@code null}, the class loader
  * instance provided should be used during deserialization to load classes needed by the deserialized objects.
+ * 在默认序列化提供程序中使用时，还有一个附加要求。
+ * 这些实现必须定义一个接受{@code ClassLoader}的构造函数。
+ * {@code ClassLoader}值可以是{@code null}。如果不是{@code null}，则应在反序列化期间使用提供的类装入器实例来加载反序列化对象所需的类。
  * <p>
  * The serialized object's class must be preserved; deserialization of the serial form of an object must
  * return an object of the same class. The following contract must always be true:
+ * 序列化对象的类必须保留；对象串行形式的反序列化必须返回同一类的对象。以下合同必须始终为真：
  * <p>
  * {@code object.getClass().equals( mySerializer.read(mySerializer.serialize(object)).getClass())}
  *

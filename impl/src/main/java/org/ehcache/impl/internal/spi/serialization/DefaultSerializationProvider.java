@@ -75,8 +75,8 @@ public class DefaultSerializationProvider implements SerializationProvider {
     // yukms TODO: 获取自定义的序列化器
     DefaultSerializerConfiguration<T> configuration = find(DefaultSerializerConfiguration.Type.KEY, configs);
     Serializer<T> serializer = getUserProvidedSerializer(configuration);
-    // yukms TODO: 为什么存在没有实例化的序列化器
     if (serializer == null) {
+      // yukms TODO: 用户未提供序列化器
       serializer = createSerializer(clazz, classLoader, configuration, configs);
       // yukms TODO: 放置已经实例化的序列化器
       instantiated.add(serializer);
@@ -110,8 +110,8 @@ public class DefaultSerializationProvider implements SerializationProvider {
     }
 
     try {
-      // yukms TODO: 为什么必须要有构造函数必须有ClassLoader呢？默认的序列化器都没有用到该参数
       // yukms TODO: 反射实例化序列化器
+      // yukms TODO: 为什么必须要有构造函数必须有ClassLoader呢？默认的序列化器都没有用到该参数
       return constructSerializer(clazz, klazz.getConstructor(ClassLoader.class), classLoader);
     } catch (NoSuchMethodException e) {
       throw new RuntimeException(klazz + " does not have a constructor that takes in a ClassLoader.", e);

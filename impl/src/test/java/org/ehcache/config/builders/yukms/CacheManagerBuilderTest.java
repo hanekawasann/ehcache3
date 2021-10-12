@@ -67,7 +67,7 @@ public class CacheManagerBuilderTest {
   }
 
   private String getPath() {
-    return "c:\\ehcache_test" + UUID.randomUUID();
+    return "k:\\ehcache_test" + UUID.randomUUID();
   }
 
   @Test
@@ -76,7 +76,7 @@ public class CacheManagerBuilderTest {
       .with(CacheManagerBuilder.persistence(getPath())).build(true);
     cacheManager.createCache("cache1",
       CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
-        ResourcePoolsBuilder.newResourcePoolsBuilder().heap(2, MemoryUnit.MB).disk(4, MemoryUnit.MB)));
+        ResourcePoolsBuilder.newResourcePoolsBuilder().heap(2, MemoryUnit.MB).disk(4, MemoryUnit.MB, true)));
     //cacheManager.getCache("cache1", String.class, String.class);
     //cacheManager.removeCache("cache1");
   }

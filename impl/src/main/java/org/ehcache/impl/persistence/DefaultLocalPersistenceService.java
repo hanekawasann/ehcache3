@@ -146,13 +146,13 @@ public class DefaultLocalPersistenceService implements LocalPersistenceService {
     validateName(owner);
     SafeSpace ss = createSafeSpaceLogical(owner, identifier);
 
-    // yukms TODO: 怎么出现这种情况的
     for (File parent = ss.directory.getParentFile(); parent != null; parent = parent.getParentFile()) {
       if (rootDirectory.equals(parent)) {
         return new DefaultSafeSpaceIdentifier(ss);
       }
     }
 
+    // yukms TODO: 什么场景？？？
     throw new IllegalArgumentException("Attempted to access file outside the persistence path");
   }
 
@@ -163,6 +163,7 @@ public class DefaultLocalPersistenceService implements LocalPersistenceService {
   public void createSafeSpace(SafeSpaceIdentifier safeSpaceId) throws CachePersistenceException {
     if (safeSpaceId == null || !(safeSpaceId instanceof DefaultSafeSpaceIdentifier)) {
       // this cannot happen..if identifier created before creating physical space..
+      // yukms TODO: 如果在创建物理空间之前创建了标识符，则不会发生此情况。。
       throw new AssertionError("Invalid safe space identifier. Identifier not created");
     }
     SafeSpace ss = ((DefaultSafeSpaceIdentifier) safeSpaceId).safeSpace;
@@ -177,6 +178,7 @@ public class DefaultLocalPersistenceService implements LocalPersistenceService {
   public void destroySafeSpace(SafeSpaceIdentifier safeSpaceId, boolean verbose) {
     if (safeSpaceId == null || !(safeSpaceId instanceof DefaultSafeSpaceIdentifier)) {
       // this cannot happen..if identifier created before creating/destroying physical space..
+      // yukms TODO: 如果在创建或销毁物理空间之前创建了标识符，则不会发生此情况。。
       throw new AssertionError("Invalid safe space identifier. Identifier not created");
     }
     SafeSpace ss = ((DefaultSafeSpaceIdentifier) safeSpaceId).safeSpace;
@@ -204,6 +206,7 @@ public class DefaultLocalPersistenceService implements LocalPersistenceService {
       LOGGER.debug("Destroying file based persistence context for {}", ss.identifier);
     }
     if (ss.directory.exists() && !tryRecursiveDelete(ss.directory)) {
+      // yukms TODO: 如果文件夹存在 && 尝试删除失败
       if (verbose) {
         LOGGER.warn("Could not delete directory for context {}", ss.identifier);
       }

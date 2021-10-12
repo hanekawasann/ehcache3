@@ -24,6 +24,7 @@ import java.util.Collection;
 /**
  * Marker interface for {@link Store}s which act like wrapper and does not have any storage, rather
  * delegate the storage to other stores
+ * {@link Store}的标记接口，其作用类似于包装器，没有任何存储，而是将存储委托给其他存储
  * @param <K> the key type
  * @param <V> the value type
  */
@@ -38,6 +39,7 @@ public interface WrapperStore<K, V> extends Store<K, V> {
     /**
      * Gets the internal ranking for the {@code WrapperStore} instances provided by this {@code Provider} of the wrapper
      * store's
+     * 获取包装存储的{@code Provider}提供的{@code WrapperStore}实例的内部排名
      *
      * @param serviceConfigs the collection of {@code ServiceConfiguration} instances that may contribute
      *                       to the ranking

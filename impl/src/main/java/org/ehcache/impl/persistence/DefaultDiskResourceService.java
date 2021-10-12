@@ -102,16 +102,19 @@ public class DefaultDiskResourceService implements DiskResourceService {
     if (persistenceService == null) {
       return null;
     }
-    // yukms TODO: 磁盘难道不是持久化？这里不应必然为真吗？需要debug
+    // yukms TODO: org.ehcache.config.ResourcePool.isPersistent
     boolean persistent = config.getResourcePools().getPoolForResource(ResourceType.Core.DISK).isPersistent();
+    // yukms TODO: 循环直到创建成功
     while (true) {
-      // yukms TODO: 循环直到创建成功
       PersistenceSpace persistenceSpace = knownPersistenceSpaces.get(name);
       if (persistenceSpace != null) {
+        // yukms TODO: 已经创建直接返回
         return persistenceSpace.identifier;
       }
+      // yukms TODO: 没有创建的话需要创建
       PersistenceSpace newSpace = createSpace(name, persistent);
       if (newSpace != null) {
+        // yukms TODO: 创建成功则返回
         return newSpace.identifier;
       }
     }
@@ -146,12 +149,12 @@ public class DefaultDiskResourceService implements DiskResourceService {
     DefaultPersistenceSpaceIdentifier persistenceSpaceIdentifier =
         new DefaultPersistenceSpaceIdentifier(persistenceService.createSafeSpaceIdentifier(PERSISTENCE_SPACE_OWNER, name));
     PersistenceSpace persistenceSpace = new PersistenceSpace(persistenceSpaceIdentifier);
+    // yukms TODO: 并发抢占检测
     if (knownPersistenceSpaces.putIfAbsent(name, persistenceSpace) == null) {
-      // yukms TODO: 抢占检测
       boolean created = false;
       try {
         if (!persistent) {
-          // yukms TODO: 什么情况下会出现？
+          // yukms TODO: 如果资源不是持久化，则尝试销毁该文件夹的内容
           persistenceService.destroySafeSpace(persistenceSpaceIdentifier.persistentSpaceId, true);
         }
         // yukms TODO: 创建文件夹
@@ -160,6 +163,8 @@ public class DefaultDiskResourceService implements DiskResourceService {
       } finally {
         if (!created) {
           // this happens only if an exception is thrown..clean up for any throwable..
+          // yukms TODO: 只有在抛出异常时才会发生此情况。请清理任何可丢弃项。。
+          // yukms TODO: 创建失败丢弃
           knownPersistenceSpaces.remove(name, persistenceSpace);
         }
       }

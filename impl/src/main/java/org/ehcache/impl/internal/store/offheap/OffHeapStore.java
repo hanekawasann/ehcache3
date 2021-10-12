@@ -141,6 +141,7 @@ public class OffHeapStore<K, V> extends AbstractOffHeapStore<K, V> {
 
     @Override
     public int rank(final Set<ResourceType<?>> resourceTypes, final Collection<ServiceConfiguration<?, ?>> serviceConfigs) {
+      // yukms TODO: 如果缓存配置多层，那么此处永远返回0
       return resourceTypes.equals(Collections.singleton(ResourceType.Core.OFFHEAP)) ? 1 : 0;
     }
 

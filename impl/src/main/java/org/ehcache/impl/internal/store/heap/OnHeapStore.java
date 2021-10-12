@@ -1631,7 +1631,7 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
 
     @Override
     public int rank(Set<ResourceType<?>> resourceTypes, Collection<ServiceConfiguration<?, ?>> serviceConfigs) {
-      // yukms TODO: 这里的Set.equals是没看明白，ResourceType存在多个岂不是永远都返回false？
+      // yukms TODO: 如果缓存配置多层，那么此处永远返回0
       return resourceTypes.equals(Collections.singleton(getResourceType())) ? 1 : 0;
     }
 

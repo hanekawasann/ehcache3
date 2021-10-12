@@ -581,6 +581,7 @@ public interface Store<K, V> extends ConfigurationChangeSupport {
     /**
      * Gets the internal ranking for the {@link Store} instances provided by this {@code Provider} of the store's
      * ability to handle the specified resources.  A higher rank value indicates a more capable {@code Store}.
+     * 获取该{@code Provider}提供的{@link Store}实例处理指定资源的能力的内部排名。秩值越高表示{@code Store}的能力越强。
      *
      * @param resourceTypes the set of {@code ResourceType}s for the store to handle
      * @param serviceConfigs the collection of {@code ServiceConfiguration} instances that may contribute

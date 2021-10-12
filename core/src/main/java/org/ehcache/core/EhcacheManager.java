@@ -549,6 +549,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
     boolean operationStatisticsEnabled = findOptionalAmongst(StoreStatisticsConfiguration.class, serviceConfigurations)
       .map(StoreStatisticsConfiguration::isOperationStatisticsEnabled)
       // By default, we enable statistics only in a tiered environment
+      // yukms TODO: 默认情况下，我们仅在分层环境中启用统计信息
       .orElseGet(() -> config.getResourcePools().getResourceTypeSet().size() > 1);
 
     Store.Configuration<K, V> storeConfiguration = new StoreConfigurationImpl<>(config, dispatcherConcurrency,

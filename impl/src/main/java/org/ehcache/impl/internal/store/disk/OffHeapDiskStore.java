@@ -315,6 +315,7 @@ public class OffHeapDiskStore<K, V> extends AbstractOffHeapStore<K, V> implement
 
     @Override
     public int rank(final Set<ResourceType<?>> resourceTypes, final Collection<ServiceConfiguration<?, ?>> serviceConfigs) {
+      // yukms TODO: 如果缓存配置多层，那么此处永远返回0
       return resourceTypes.equals(Collections.singleton(getResourceType())) ? 1 : 0;
     }
 
