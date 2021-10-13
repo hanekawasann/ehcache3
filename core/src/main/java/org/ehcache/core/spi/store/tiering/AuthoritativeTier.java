@@ -28,8 +28,10 @@ import java.util.function.Function;
 
 /**
  * Authoritative tier, that is the lower most tier of a multi tiered store.
+ * 权威层，即多层存储的最底层。
  * <p>
  * By design this tier will always hold all the mappings contained in the {@link org.ehcache.Cache}
+ * 通过设计，此层将始终保存{@link org.ehcache.Cache}中包含的所有映射
  *
  * @param <K> the key type
  * @param <V> the value type

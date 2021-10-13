@@ -271,6 +271,7 @@ public class CompoundCachingTier<K, V> implements CachingTier<K, V> {
 
     @Override
     public int rankCachingTier(Set<ResourceType<?>> resourceTypes, Collection<ServiceConfiguration<?, ?>> serviceConfigs) {
+      // yukms TODO: 堆内和堆外
       return resourceTypes.equals(unmodifiableSet(EnumSet.of(HEAP, OFFHEAP))) ? 2 : 0;
 
     }

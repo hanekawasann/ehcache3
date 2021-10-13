@@ -97,12 +97,14 @@ public final class StoreSupport {
     }
 
     if (rankingProviders.isEmpty()) {
+      // yukms TODO: 没有找到Provider
       StringBuilder sb = new StringBuilder("No Store.Provider found to handle configured resource types ");
       sb.append(resourceTypes);
       sb.append(" from ");
       formatStoreProviders(filteredStoreProviders, sb);
       throw new IllegalStateException(sb.toString());
     } else if (rankingProviders.size() > 1) {
+      // yukms TODO: 找到的Provider不只一个
       StringBuilder sb = new StringBuilder("Multiple Store.Providers found to handle configured resource types ");
       sb.append(resourceTypes);
       sb.append(": ");
@@ -110,6 +112,7 @@ public final class StoreSupport {
       throw new IllegalStateException(sb.toString());
     }
 
+    // yukms TODO: 正常返回
     return rankingProviders.get(0);
   }
 

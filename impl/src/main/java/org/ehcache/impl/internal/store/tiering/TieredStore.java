@@ -51,6 +51,7 @@ import java.util.function.Supplier;
 
 /**
  * A {@link Store} implementation supporting a tiered caching model.
+ * 支持分层缓存模型的{@link Store}实现。
  */
 public class TieredStore<K, V> implements Store<K, V> {
 
@@ -403,23 +404,30 @@ public class TieredStore<K, V> implements Store<K, V> {
     @Override
     public int rank(final Set<ResourceType<?>> resourceTypes, final Collection<ServiceConfiguration<?, ?>> serviceConfigs) {
       if (resourceTypes.size() == 1) {
+        // yukms TODO: 必须是多层缓存
         return 0;
       }
+      // yukms TODO: 获取层级最低的ResourceType
       ResourceType<?> authorityResource = getAuthorityResource(resourceTypes);
+      // yukms TODO: 获取最低ResourceType的rank
       int authorityRank = 0;
       Collection<AuthoritativeTier.Provider> authorityProviders = serviceProvider.getServicesOfType(AuthoritativeTier.Provider.class);
       for (AuthoritativeTier.Provider authorityProvider : authorityProviders) {
         int newRank = authorityProvider.rankAuthority(authorityResource, serviceConfigs);
         if (newRank > authorityRank) {
+          // yukms TODO: ResourceType能匹配多个Provider，取层级最低的Provider
           authorityRank = newRank;
         }
       }
       if (authorityRank == 0) {
+        // yukms TODO: 0表示未匹配到AuthoritativeTier.Provider
         return 0;
       }
+      // yukms TODO: 获取最底层之上的ResourceType
       Set<ResourceType<?>> cachingResources = new HashSet<>(resourceTypes);
       cachingResources.remove(authorityResource);
       int cachingTierRank = 0;
+      // yukms TODO: 获取最底层之上ResourceType对用的Provider
       Collection<CachingTier.Provider> cachingTierProviders = serviceProvider.getServicesOfType(CachingTier.Provider.class);
       for (CachingTier.Provider cachingTierProvider : cachingTierProviders) {
         int newRank = cachingTierProvider.rankCachingTier(cachingResources, serviceConfigs);
@@ -428,6 +436,7 @@ public class TieredStore<K, V> implements Store<K, V> {
         }
       }
       if (cachingTierRank == 0) {
+        // yukms TODO: 0表示未匹配到CachingTier.Provider
         return 0;
       }
       return authorityRank + cachingTierRank;
@@ -445,20 +454,25 @@ public class TieredStore<K, V> implements Store<K, V> {
 
     @Override
     public <K, V> Store<K, V> createStore(Configuration<K, V> storeConfig, ServiceConfiguration<?, ?>... serviceConfigs) {
+      // yukms TODO: org.ehcache.impl.persistence.DefaultDiskResourceService.DefaultPersistenceSpaceIdentifier
       final List<ServiceConfiguration<?, ?>> enhancedServiceConfigs = new ArrayList<>(Arrays.asList(serviceConfigs));
 
       final ResourcePools resourcePools = storeConfig.getResourcePools();
+      // yukms TODO: 这里应该是再次检查
       if (rank(resourcePools.getResourceTypeSet(), enhancedServiceConfigs) == 0) {
         throw new IllegalArgumentException("TieredStore.Provider does not support configured resource types "
             + resourcePools.getResourceTypeSet());
       }
 
+      // yukms TODO: 获取最底层的ResourceType
       ResourceType<?> authorityResource = getAuthorityResource(resourcePools.getResourceTypeSet());
+      // yukms TODO: 获取最底层的ResourceType对应的AuthoritativeTier.Provider
       AuthoritativeTier.Provider authoritativeTierProvider = getAuthoritativeTierProvider(authorityResource, enhancedServiceConfigs);
 
+      // yukms TODO: 获取最底层之上的ResourceType
       Set<ResourceType<?>> cachingResources = new HashSet<>(resourcePools.getResourceTypeSet());
       cachingResources.remove(authorityResource);
-
+      // yukms TODO: 获取最底层之上ResourceType对应的Provider，如果存在多个则是org.ehcache.impl.internal.store.tiering.CompoundCachingTier.Provider
       CachingTier.Provider cachingTierProvider = getCachingTierProvider(cachingResources, enhancedServiceConfigs);
 
       final ServiceConfiguration<?, ?>[] configurations =

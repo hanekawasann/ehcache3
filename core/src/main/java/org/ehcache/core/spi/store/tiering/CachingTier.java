@@ -30,9 +30,11 @@ import java.util.function.Function;
 
 /**
  * Caching tier is the abstraction for tiers sitting atop the {@link AuthoritativeTier}.
+ * 缓存层是位于{@link AuthoritativeTier}之上的层的抽象。
  * <p>
  * As soon as there is more than one tier in a {@link Store}, one will be the {@link AuthoritativeTier} while others
  * will be regrouped under the {@code CachingTier}
+ * 一旦{@link Store}中有多个层，其中一层将成为{@link AuthoritativeTier}，而其他层将在{@code CachingTier}下重新组合
  *
  * @param <K> the key type
  * @param <V> the value type

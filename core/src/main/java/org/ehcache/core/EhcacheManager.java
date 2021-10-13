@@ -555,7 +555,6 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
     Store.Configuration<K, V> storeConfiguration = new StoreConfigurationImpl<>(config, dispatcherConcurrency,
       operationStatisticsEnabled, keySerializer, valueSerializer, loaderWriter, useLoaderInAtomics);
 
-    // yukms TODO: 多层只实例化一层是为什么？
     // yukms TODO: org.ehcache.core.spi.store.WrapperStore.Provider
     Store.Provider storeProvider = StoreSupport.selectWrapperStoreProvider(serviceLocator, serviceConfigs);
     if (storeProvider == null) {
@@ -669,7 +668,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
           }
         }
         try {
-          // yukms TODO: 停止每个service（这里stop了全局的serviceLocator，那不是这些service就无法使用了吗？）
+          // yukms TODO: 如果创建失败则停止每个service
           serviceLocator.stopAllServices();
         } catch (Exception exceptionStoppingServices) {
           LOGGER.error("Stopping services after initialization failure failed due to ", exceptionStoppingServices);
