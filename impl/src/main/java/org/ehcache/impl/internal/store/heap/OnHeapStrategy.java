@@ -30,6 +30,7 @@ import java.util.function.Supplier;
 
 /**
  * Specialized behavior for an OnHeapStore allowing optimization depending on the expiry policy used.
+ * OnHeapStore的特殊行为，允许根据使用的过期策略进行优化。
  *
  * @param <K> type of the keys stored
  * @param <V> type of the values stored

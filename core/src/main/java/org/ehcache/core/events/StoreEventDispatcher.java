@@ -21,12 +21,15 @@ import org.ehcache.core.spi.store.events.StoreEventSource;
 
 /**
  * Part of the events subsystem at the {@link Store} level.
+ * {@link Store}级别的事件子系统的一部分。
  * <p>
  * This interface controls the lifecycle of {@link StoreEventSink}s, enabling implementations to decouple the event
  * raising inside the {@link Store} from the firing to outside collaborators.
+ * 此接口控制{@link StoreEventSink}的生命周期，使实现能够将{@link Store}内部引发的事件与外部协作者的触发分离。
  * <p>
  * {@link Store} implementations are expected to get a {@link StoreEventSink} per
  * operation and release it once the operation completes.
+ * {@link Store}实现期望每个操作获得一个{@link StoreEventSink}，并在操作完成后释放它。
  */
 public interface StoreEventDispatcher<K, V> extends StoreEventSource<K, V> {
 

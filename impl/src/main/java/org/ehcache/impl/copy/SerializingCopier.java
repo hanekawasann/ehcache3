@@ -22,6 +22,7 @@ import org.ehcache.spi.serialization.Serializer;
 
 /**
  * A helper copier implementation that performs the "copying" using {@link Serializer serialization}.
+ * 使用{@link Serializer serialization}执行“复制”的助手复制器实现。
  */
 public final class SerializingCopier<T> extends ReadWriteCopier<T> {
 

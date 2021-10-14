@@ -27,6 +27,7 @@ import java.util.function.Function;
 
 /**
  * Interface for the higher tier of a multi-tier {@link CachingTier}.
+ * 多层{@link CachingTier}更高层的接口。
  *
  * @param <K> the key type
  * @param <V> the value type

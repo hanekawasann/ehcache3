@@ -1655,7 +1655,6 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
 
     public <K, V> OnHeapStore<K, V> createStoreInternal(Configuration<K, V> storeConfig, StoreEventDispatcher<K, V> eventDispatcher,
                                                         ServiceConfiguration<?, ?>... serviceConfigs) {
-      // yukms TODO: 都stop了，怎么还能使用
       TimeSource timeSource = getServiceProvider().getService(TimeSourceService.class).getTimeSource();
       CopyProvider copyProvider = getServiceProvider().getService(CopyProvider.class);
       Copier<K> keyCopier  = copyProvider.createKeyCopier(storeConfig.getKeyType(), storeConfig.getKeySerializer(), serviceConfigs);

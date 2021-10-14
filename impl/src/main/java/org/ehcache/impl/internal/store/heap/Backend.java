@@ -30,6 +30,7 @@ import java.util.function.BiFunction;
 /**
  * The idea of this backend is to let all the store code deal in terms of {@code <K>} and hide the potentially different
  * key type of the underlying {@link org.ehcache.impl.internal.concurrent.ConcurrentHashMap}.
+ * 这个后端的想法是让所有存储代码按照{@code<K>}进行处理，并隐藏底层{@link org.ehcache.impl.internal.concurrent.ConcurrentHashMap}的可能不同的键类型。
  */
 interface Backend<K, V> {
   OnHeapValueHolder<V> remove(K key);

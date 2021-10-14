@@ -73,6 +73,7 @@ public class CacheManagerBuilderTest {
   @Test
   public void test_cache() {
     CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+      .withDefaultSizeOfMaxObjectGraph(111)
       .with(CacheManagerBuilder.persistence(getPath())).build(true);
     cacheManager.createCache("cache1",
       CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,

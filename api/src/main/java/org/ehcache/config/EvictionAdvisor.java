@@ -18,6 +18,7 @@ package org.ehcache.config;
 
 /**
  * A specialized predicate used to advise on eviction of cache entries.
+ * 一种专门的谓词，用于建议删除缓存项。
  *
  * @param <K> the key type for the cache
  * @param <V> the value type for the cache

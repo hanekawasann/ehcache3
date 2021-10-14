@@ -57,6 +57,7 @@ public class DefaultSizeOfEngineProvider implements SizeOfEngineProvider {
     }
     DefaultSizeOfEngineConfiguration config = ServiceUtils.findSingletonAmongst(DefaultSizeOfEngineConfiguration.class, (Object[]) serviceConfigs);
     if(config != null) {
+      // yukms TODO: 根据配置创建
       long maxSize = config.getUnit().toBytes(config.getMaxObjectSize());
       return new DefaultSizeOfEngine(config.getMaxObjectGraphSize(), maxSize);
     }

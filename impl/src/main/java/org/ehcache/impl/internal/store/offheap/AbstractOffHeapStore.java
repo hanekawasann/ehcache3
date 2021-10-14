@@ -155,9 +155,9 @@ public abstract class AbstractOffHeapStore<K, V> extends BaseStore<K, V> impleme
   private <T extends Serializable> void registerStatistic(String name, StatisticType type, Set<String> tags, Function<EhcacheOffHeapBackingMap<K, OffHeapValueHolder<V>>, T> fn) {
     registerStatistic(name, type, tags, () -> {
       EhcacheOffHeapBackingMap<K, OffHeapValueHolder<V>> map = backingMap();
-      // Returning null means not available.
-      // Do not return -1 because a stat can be negative and it's hard to tell the difference
-      // between -1 meaning unavailable for a stat and for the other one -1 being a right value;
+      // Returning null means not available.返回null表示不可用。
+      // Do not return -1 because a stat can be negative and it's hard to tell the difference 不要返回-1，因为一个属性可以是负数，很难区分它们之间的区别
+      // between -1 meaning unavailable for a stat and for the other one -1 being a right value; 介于-1之间意味着一个统计不可用，而另一个-1是正确的值；
       return map == null ? null : fn.apply(map);
     });
   }

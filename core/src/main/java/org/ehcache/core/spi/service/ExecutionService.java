@@ -25,9 +25,11 @@ import java.util.concurrent.ScheduledExecutorService;
 /**
  * Configuration of ExecutionService defines named pools of threads.  Consumers
  * reference a specific pool of threads from which their "executor" is derived.
+ * ExecutionService的配置定义了命名的线程池。使用者引用从中派生其“执行器”的特定线程池。
  * <p>
  * Shutdown of these derived executors shuts down the derived executors but does
  * nothing to the underlying thread pool.
+ * 关闭这些派生执行器会关闭派生执行器，但不会对底层线程池执行任何操作。
  */
 public interface ExecutionService extends Service {
 

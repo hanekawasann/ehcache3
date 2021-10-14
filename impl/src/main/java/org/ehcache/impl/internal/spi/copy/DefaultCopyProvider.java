@@ -80,6 +80,7 @@ public class DefaultCopyProvider extends ClassInstanceProvider<Class<?>, Default
       }
       copier = new SerializingCopier<>(serializer);
     } else {
+      // yukms TODO: 根据配置创建
       copier = createCopier(clazz, conf, type);
     }
     LOG.debug("Copier for <{}> : {}", clazz.getName(), copier);
@@ -87,9 +88,11 @@ public class DefaultCopyProvider extends ClassInstanceProvider<Class<?>, Default
   }
 
   private <T> Copier<T> createCopier(Class<T> clazz, DefaultCopierConfiguration<T> config, Type type) {
+    // yukms TODO: 根据配置创建
     @SuppressWarnings("unchecked")
     Copier<T> copier = (Copier<T>) newInstance(clazz, config);
     if (copier == null) {
+      // yukms TODO: 没有配置创建默认的IdentityCopier
       @SuppressWarnings({"unchecked", "rawtypes"})
       Copier<T> defaultInstance = (Copier<T>) newInstance(clazz, new DefaultCopierConfiguration<>((Class<Copier<T>>) (Class) IdentityCopier.class, type));
       copier = defaultInstance;

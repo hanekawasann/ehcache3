@@ -221,6 +221,7 @@ public class CompoundCachingTier<K, V> implements CachingTier<K, V> {
         throw new RuntimeException("ServiceProvider is null.");
       }
 
+      // yukms TODO: org.ehcache.impl.internal.store.heap.OnHeapStore.Provider
       Collection<HigherCachingTier.Provider> higherProviders = serviceProvider.getServicesOfType(HigherCachingTier.Provider.class);
       if (higherProviders.size() != 1) {
         throw new IllegalStateException("Cannot handle multiple higher tier providers");
@@ -228,6 +229,7 @@ public class CompoundCachingTier<K, V> implements CachingTier<K, V> {
       HigherCachingTier.Provider higherProvider = higherProviders.iterator().next();
       HigherCachingTier<K, V> higherCachingTier = higherProvider.createHigherCachingTier(storeConfig, serviceConfigs);
 
+      // yukms TODO: org.ehcache.impl.internal.store.offheap.OffHeapStore.Provider
       Collection<LowerCachingTier.Provider> lowerProviders = serviceProvider.getServicesOfType(LowerCachingTier.Provider.class);
       if (lowerProviders.size() != 1) {
         throw new IllegalStateException("Cannot handle multiple lower tier providers");

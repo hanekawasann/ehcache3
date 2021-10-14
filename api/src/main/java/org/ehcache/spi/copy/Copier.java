@@ -18,8 +18,10 @@ package org.ehcache.spi.copy;
 
 /**
  * Defines the contract used to copy type instances.
+ * 定义用于复制类型实例的约定。
  * <p>
  * The copied object's class must be preserved.  The following must always be true:
+ * 必须保留复制对象的类。以下内容必须始终正确：
  * <p>
  * <code>object.getClass().equals( myCopier.copyForRead(object).getClass() )</code>
  * <code>object.getClass().equals( myCopier.copyForWrite(object).getClass() )</code>

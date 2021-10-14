@@ -23,6 +23,7 @@ import org.ehcache.spi.copy.Copier;
  * A helper {@link Copier} implementation that can be extended directly
  * if the copying operation is the same irrespective of the action
  * performed (read or write).
+ * 一种助手{@link Copier}实现，如果复制操作相同，则无论执行何种操作（读或写），都可以直接扩展它。
  */
 public abstract class ReadWriteCopier<T> implements Copier<T> {
 
