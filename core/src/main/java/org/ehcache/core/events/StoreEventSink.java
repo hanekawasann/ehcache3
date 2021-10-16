@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 
 /**
  * Interface on which {@link org.ehcache.core.spi.store.Store} operations are to record events.
+ * 用于记录事件的{@link org.ehcache.core.spi.store.Store}操作的接口。
  */
 public interface StoreEventSink<K, V> {
 

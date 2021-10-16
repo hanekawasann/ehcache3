@@ -21,6 +21,7 @@ import org.ehcache.event.EventType;
 
 /**
  * Interface used to create {@link Store} event filters
+ * 用于创建{@link Store}事件筛选器的接口
  */
 public interface StoreEventFilter<K, V> {
 

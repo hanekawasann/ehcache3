@@ -227,6 +227,7 @@ public abstract class AbstractOffHeapStore<K, V> extends BaseStore<K, V> impleme
     putObserver.begin();
 
     final AtomicBoolean put = new AtomicBoolean();
+    // yukms TODO: org.ehcache.impl.internal.events.ThreadLocalStoreEventDispatcher
     final StoreEventSink<K, V> eventSink = eventDispatcher.eventSink();
 
     final long now = timeSource.getTimeMillis();
@@ -234,14 +235,17 @@ public abstract class AbstractOffHeapStore<K, V> extends BaseStore<K, V> impleme
       BiFunction<K, OffHeapValueHolder<V>, OffHeapValueHolder<V>> mappingFunction = (mappedKey, mappedValue) -> {
 
         if (mappedValue != null && mappedValue.isExpired(now)) {
+          // yukms TODO: 已过期
           mappedValue = null;
         }
 
         if (mappedValue == null) {
+          // yukms TODO: 过期新增
           OffHeapValueHolder<V> newValue = newCreateValueHolder(key, value, now, eventSink);
           put.set(newValue != null);
           return newValue;
         } else {
+          // yukms TODO: 不过期修改
           OffHeapValueHolder<V> newValue = newUpdatedValueHolder(key, value, mappedValue, now, eventSink);
           put.set(true);
           return newValue;
@@ -1103,6 +1107,7 @@ public abstract class AbstractOffHeapStore<K, V> extends BaseStore<K, V> impleme
 
     Duration duration = ExpiryUtils.getExpiryForCreation(key, value, expiry);
     if(duration.isZero()) {
+      // yukms TODO: 已过期
       return null;
     }
 

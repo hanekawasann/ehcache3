@@ -23,18 +23,24 @@ import org.ehcache.spi.loaderwriter.CacheLoaderWriter;
 
 /**
  * A strategy for providing cache resilience in the face of failure.
+ * 一种在出现故障时提供缓存恢复能力的策略。
  * <p>
  * An implementation of this interface is used by a cache to decide how to
  * recover after internal components of the cache fail.  Implementations of
  * these methods are expected to take suitable recovery steps.  They can then
  * choose between allowing the operation to terminate successfully, or throw an
  * exception which will be propagated to the thread calling in to the cache.
+ * 缓存使用此接口的实现来决定在缓存的内部组件发生故障后如何恢复。
+ * 这些方法的实现需要采取适当的恢复步骤。
+ * 然后，他们可以选择是允许操作成功终止，还是抛出一个异常，该异常将传播到调用缓存的线程。
  * <p>
  * Resilience in this context refers only to resilience against cache failures
  * and not to resilience against failures of any underlying
  * {@link CacheLoaderWriter}.  To this end writer or loader failures will only be
  * reported to the strategy in the context of a coincident cache failure.
  * Isolated writer and loader exceptions will be thrown directly.
+ * 在此上下文中，弹性仅指针对缓存故障的弹性，而不是针对任何底层{@link CacheLoaderWriter}的故障的弹性。
+ * 为此，写入程序或加载程序故障将仅在同时发生缓存故障的情况下报告给策略。将直接引发独立的写入程序和加载程序异常。
  *
  * @param <K> the type of the keys used to access data within the cache
  * @param <V> the type of the values held within the cache

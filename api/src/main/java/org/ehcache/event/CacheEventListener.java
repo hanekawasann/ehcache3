@@ -19,6 +19,7 @@ package org.ehcache.event;
 /**
  * Definition of the contract for implementing listeners to receive {@link CacheEvent}s from a
  * {@link org.ehcache.Cache Cache}.
+ * 定义用于实现侦听器以从{@link org.ehcache.Cache}接收{@link CacheEvent}的协定。
  *
  * @param <K> the key type for the observed cache
  * @param <V> the value type for the observed cache

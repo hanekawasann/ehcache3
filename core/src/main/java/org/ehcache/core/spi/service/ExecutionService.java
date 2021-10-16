@@ -35,6 +35,7 @@ public interface ExecutionService extends Service {
 
   /**
    * Get a pre-configured {@link ScheduledExecutorService} instance.
+   * 获取预配置的{@link ScheduledExecutorService}实例。
    *
    * @param poolAlias the requested pool alias.
    * @return the {@link ScheduledExecutorService} instance.
@@ -45,6 +46,7 @@ public interface ExecutionService extends Service {
 
   /**
    * Get a pre-configured {@link ExecutorService} instance that guarantees execution in submission order.
+   * 获取预先配置的{@link ExecutorService}实例，该实例保证按提交顺序执行。
    *
    * @param poolAlias the requested pool alias.
    * @param queue the queue in which pending tasks are to be queued.
@@ -57,6 +59,7 @@ public interface ExecutionService extends Service {
 
   /**
    * Get a pre-configured {@link ExecutorService} instance.
+   * 获取预配置的{@link ExecutorService}实例。
    *
    * @param poolAlias the requested pool alias.
    * @param queue the queue in which pending tasks are to be queued.

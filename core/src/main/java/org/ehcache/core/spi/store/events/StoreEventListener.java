@@ -21,9 +21,11 @@ import org.ehcache.core.events.StoreEventDispatcher;
 /**
  * Interface used to register on a {@link StoreEventSource} to get notified of events happening to mappings the
  * {@link org.ehcache.core.spi.store.Store} contains.
+ * 接口，用于在{@link StoreEventSource}上注册以获得{@link org.ehcache.core.spi.store.Store}包含的映射发生事件的通知。
  * <p>
  * Implementations of this class are expected to work in combination with an implementation of
  * {@link StoreEventDispatcher}.
+ * 此类的实现应与{@link StoreEventDispatcher}的实现结合使用。
  *
  * @param <K> the key type of the mappings
  * @param <V> the value type of the mappings

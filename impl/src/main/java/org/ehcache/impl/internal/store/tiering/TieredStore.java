@@ -106,6 +106,7 @@ public class TieredStore<K, V> implements Store<K, V> {
   @Override
   public PutStatus put(final K key, final V value) throws StoreAccessException {
     try {
+      // yukms TODO: put直接给最底层
       return authoritativeTier.put(key, value);
     } finally {
       cachingTier().invalidate(key);

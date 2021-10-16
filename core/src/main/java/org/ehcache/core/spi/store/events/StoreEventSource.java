@@ -18,6 +18,7 @@ package org.ehcache.core.spi.store.events;
 
 /**
  * Interface to enable listening on and configuring the {@link org.ehcache.core.spi.store.Store} eventing system.
+ * 接口以启用侦听和配置{@link org.ehcache.core.spi.store.Store}事件系统。
  */
 public interface StoreEventSource<K, V> {
 

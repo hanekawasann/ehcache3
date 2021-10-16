@@ -1,5 +1,7 @@
 package org.ehcache.config.builders.yukms;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import org.ehcache.Cache;
@@ -7,6 +9,7 @@ import org.ehcache.CacheManager;
 import org.ehcache.CachePersistenceException;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.config.builders.ExpiryPolicyBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.config.units.MemoryUnit;
 import org.ehcache.core.EhcacheManager;
@@ -72,13 +75,33 @@ public class CacheManagerBuilderTest {
 
   @Test
   public void test_cache() {
-    CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
-      .withDefaultSizeOfMaxObjectGraph(111)
+    CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder().withDefaultSizeOfMaxObjectGraph(111)
       .with(CacheManagerBuilder.persistence(getPath())).build(true);
     cacheManager.createCache("cache1",
       CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
-        ResourcePoolsBuilder.newResourcePoolsBuilder().heap(2, MemoryUnit.MB).offheap(4, MemoryUnit.MB).disk(8, MemoryUnit.MB, true)));
-    //cacheManager.getCache("cache1", String.class, String.class);
-    //cacheManager.removeCache("cache1");
+        ResourcePoolsBuilder.newResourcePoolsBuilder().heap(2, MemoryUnit.MB).offheap(4, MemoryUnit.MB)
+          .disk(8, MemoryUnit.MB, true)));
+    cacheManager.getCache("cache1", String.class, String.class);
+    cacheManager.removeCache("cache1");
+  }
+
+  @Test
+  public void test_put() {
+    CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()//
+      .withDefaultSizeOfMaxObjectGraph(111)//
+      .with(CacheManagerBuilder.persistence(getPath()))//
+      .build(true);
+    Cache<String, String> cache = cacheManager.createCache("cache_test",
+
+      CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
+          ResourcePoolsBuilder.newResourcePoolsBuilder()//
+            .heap(2, MemoryUnit.MB)//
+            .offheap(4, MemoryUnit.MB)//
+            .disk(8, MemoryUnit.MB, true))//
+        .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.of(1, ChronoUnit.HOURS))));
+    String key = "cache_test_key";
+    cache.put(key, "cache_test_value");
+    cache.get(key);
+    cache.remove(key);
   }
 }

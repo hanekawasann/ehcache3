@@ -312,6 +312,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
     } catch (RuntimeException e) {
       failure = e;
     } finally {
+      // yukms TODO: 创建失败
       if (!success) {
         caches.remove(alias);
         value.setCache(null);
@@ -380,7 +381,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
 
     // yukms TODO: CacheEventDispatcher
     CacheEventDispatcherFactory cenlProvider = serviceLocator.getService(CacheEventDispatcherFactory.class);
-    // yukms TODO: 创建CacheEventDispatcher
+    // yukms TODO: 创建CacheEventDispatcher org.ehcache.impl.events.CacheEventDispatcherImpl
     CacheEventDispatcher<K, V> evtService =
         cenlProvider.createCacheEventDispatcher(store, adjustedServiceConfigs.toArray(new ServiceConfiguration<?, ?>[adjustedServiceConfigs.size()]));
     lifeCycledList.add(new LifeCycledAdapter() {
@@ -404,7 +405,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
     // yukms TODO: InternalCache
     InternalCache<K, V> cache = new Ehcache<>(config, store, resilienceStrategy, evtService, LoggerFactory.getLogger(Ehcache.class + "-" + alias), loaderWriter);
 
-    // yukms TODO: CacheEventListener
+    // yukms TODO: CacheEventListener org.ehcache.core.CacheConfigurationChangeListener
     CacheEventListenerProvider evntLsnrFactory = serviceLocator.getService(CacheEventListenerProvider.class);
     if (evntLsnrFactory != null) {
       @SuppressWarnings("unchecked")

@@ -35,6 +35,7 @@ public interface StoreEventDispatcher<K, V> extends StoreEventSource<K, V> {
 
   /**
    * Hands over an event sink for recording store events.
+   * 移交事件接收器以记录存储区事件。
    *
    * @return the event sink to use
    */
@@ -42,6 +43,7 @@ public interface StoreEventDispatcher<K, V> extends StoreEventSource<K, V> {
 
   /**
    * Releases the event sink after normal completion of an operation.
+   * 在操作正常完成后释放事件接收器。
    *
    * @param eventSink the event sink to release
    */
@@ -49,6 +51,7 @@ public interface StoreEventDispatcher<K, V> extends StoreEventSource<K, V> {
 
   /**
    * Releases the event sink after failure of an operation.
+   * 在操作失败后释放事件接收器。
    *
    * @param eventSink the event sink to release
    * @param throwable the exception
@@ -57,6 +60,7 @@ public interface StoreEventDispatcher<K, V> extends StoreEventSource<K, V> {
 
   /**
    * Reset an event sink by dropping all queued events.
+   * 通过删除所有排队事件重置事件接收器。
    *
    * @param eventSink the event sink to reset
    */

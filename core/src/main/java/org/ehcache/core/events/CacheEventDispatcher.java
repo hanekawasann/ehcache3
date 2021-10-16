@@ -32,6 +32,7 @@ import java.util.EnumSet;
  * Bridges the {@link Store} eventing system, by providing the
  * {@link StoreEventDispatcher} used to collect events and then produce
  * {@link CacheEvent}s that can be consumed by {@link CacheEventListener}s.
+ * 桥接{@link Store}事件系统，方法是提供用于收集事件的{@link StoreEventDispatcher}，然后生成可由{@link CacheEventListener}使用的{@link CacheEvent}。
  *
  * @param <K> the key type of mappings
  * @param <V> the value type of mappings
