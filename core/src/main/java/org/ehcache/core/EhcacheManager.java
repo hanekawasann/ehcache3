@@ -571,6 +571,7 @@ public class EhcacheManager implements PersistentCacheManager, InternalCacheMana
     lifeCycledList.add(new LifeCycled() {
       @Override
       public void init() {
+        // yukms TODO: 初始化
         storeProviderRef.get().initStore(store);
       }
 

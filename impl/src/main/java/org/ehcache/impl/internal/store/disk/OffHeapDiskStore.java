@@ -157,12 +157,14 @@ public class OffHeapDiskStore<K, V> extends AbstractOffHeapStore<K, V> implement
 
     if (dataFile.isFile() && indexFile.isFile() && metadataFile.isFile()) {
       try {
+        // yukms TODO: 已存在则恢复
         return recoverBackingMap(size, keySerializer, valueSerializer, evictionAdvisor);
       } catch (IOException ex) {
         throw new RuntimeException(ex);
       }
     } else {
       try {
+        // yukms TODO: 不存在则创建
         return createBackingMap(size, keySerializer, valueSerializer, evictionAdvisor);
       } catch (IOException ex) {
         throw new RuntimeException(ex);

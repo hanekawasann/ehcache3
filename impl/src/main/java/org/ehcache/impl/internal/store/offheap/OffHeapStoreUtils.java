@@ -29,12 +29,15 @@ public final class OffHeapStoreUtils {
   static final String PATH_PREFIX = "org.ehcache.offheap.config.";
 
   /* threshold in ms for a chunk allocation over which a warning will be logged */
+  // yukms TODO: 将记录警告的区块分配阈值（毫秒）
   private static final long SLOW_DELAY = 3000L;
   private static final String SLOW_DELAY_PROPERTY = "slowAllocationDelay";
   /* threshold in ms for a chunk allocation over which an attempt may be made to abort the VM */
+  // yukms TODO: 块分配的阈值（毫秒），在此阈值上可以尝试中止VM
   private static final long CRITICAL_DELAY = 30000L;
   private static final String CRITICAL_DELAY_PROPERTY = "criticalAllocationDelay";
   /* halt the VM when critical allocation delay is reached */
+  // yukms TODO: 达到关键分配延迟时停止VM
   private static final boolean HALT_ON_CRITICAL_DELAY = true;
   private static final String HALT_ON_CRITICAL_DELAY_PROPERTY = "haltOnCriticalAllocationDelay";
 

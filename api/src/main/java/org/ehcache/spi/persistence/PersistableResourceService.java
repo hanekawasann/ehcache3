@@ -69,8 +69,10 @@ public interface PersistableResourceService extends MaintainableService {
   /**
    * Returns a named {@link StateRepository state repository} in the context of the given
    * {@link PersistenceSpaceIdentifier identifier}.
+   * 在给定{@link PersistenceSpaceIdentifier}的上下文中返回命名的{@link StateRepository state repository}。
    * <p>
    * If the {@code StateRepository} already existed, this method returns it in a fully available state.
+   * 如果{@CodeStateRepository}已经存在，此方法将以完全可用状态返回它。
    *
    * @param identifier the space identifier
    * @param name the state repository name

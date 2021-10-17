@@ -98,7 +98,8 @@ public class CacheManagerBuilderTest {
             .heap(2, MemoryUnit.MB)//
             .offheap(4, MemoryUnit.MB)//
             .disk(8, MemoryUnit.MB, true))//
-        .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.of(1, ChronoUnit.HOURS))));
+        //.withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.of(1, ChronoUnit.HOURS)))//
+    );
     String key = "cache_test_key";
     cache.put(key, "cache_test_value");
     cache.get(key);

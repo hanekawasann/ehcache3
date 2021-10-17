@@ -28,8 +28,10 @@ public interface EvictionAdvisor<K, V> {
 
   /**
    * Returns {@code true} if the given key value pair should not be evicted if possible.
+   * 如果可能的话不应逐出给定的键值对，则返回{@code true}。
    * <p>
    * Any exception thrown from this method will be logged and the result considered {@code false}.
+   * 此方法引发的任何异常都将被记录，结果将被视为{@code false}。
    *
    * @param key the cache key
    * @param value the cache value

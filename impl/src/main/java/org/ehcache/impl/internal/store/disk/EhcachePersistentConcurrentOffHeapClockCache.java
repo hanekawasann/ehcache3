@@ -162,8 +162,10 @@ public class EhcachePersistentConcurrentOffHeapClockCache<K, V> extends Abstract
       if (newValue == null) {
         return null;
       } else if (oldValue == newValue) {
+        // yukms TODO: 新旧结果一样，metadata代表什么意思
         return metadataTuple(newValue, (pin ? PINNED : 0) | current.metadata());
       } else {
+        // yukms TODO: 新旧结果不一样
         return metadataTuple(newValue, (pin ? PINNED : 0) | (evictionAdvisor.adviseAgainstEviction(k, newValue) ? ADVISED_AGAINST_EVICTION : 0));
       }
     });

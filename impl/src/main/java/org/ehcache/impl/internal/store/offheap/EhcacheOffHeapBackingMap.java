@@ -24,12 +24,15 @@ import java.util.function.Function;
 
 import org.terracotta.offheapstore.Segment;
 
+// yukms TODO: Ehcache堆外备份映射
 public interface EhcacheOffHeapBackingMap<K, V> extends ConcurrentMap<K, V>, OffHeapMapStatistics {
 
   /**
    * Computes a new mapping for the given key by calling the function passed in. It will pin the mapping
    * if the flag is true, it will however not unpin an existing pinned mapping in case the function returns
    * the existing value.
+   * 通过调用传入的函数来计算给定键的新映射。
+   * 如果标志为true，它将锁定映射，但是如果函数返回现有值，它将不会取消锁定现有的锁定映射。
    *
    * @param key the key to compute the mapping for
    * @param mappingFunction the function to compute the mapping
@@ -42,8 +45,10 @@ public interface EhcacheOffHeapBackingMap<K, V> extends ConcurrentMap<K, V>, Off
   /**
    * Computes a new mapping for the given key by calling the function passed in only if a mapping existed already and
    * was pinned.
+   * 仅当映射已存在且已固定时，通过调用传入的函数来计算给定密钥的新映射。
    * <p>
    * The unpin function indicates if the mapping is to be unpinned or not after the operation.
+   * unpin函数指示在操作后是否取消固定映射。
    *
    * @param key the key to operate on
    * @param remappingFunction the function returning the new value
@@ -56,8 +61,10 @@ public interface EhcacheOffHeapBackingMap<K, V> extends ConcurrentMap<K, V>, Off
   /**
    * Computes a new value for the given key if a mapping is present, <code>BiFunction</code> is invoked
    * under appropriate lock scope.
+   * 为给定密钥计算新值如果存在映射，则在适当的锁作用域下调用<code>BiFunction<code>。
    * <p>
    * The pinning bit from the metadata will be set on the resulting mapping.
+   * 元数据中的固定位将在生成的映射上设置。
    *
    * @param key the key of the mapping to compute the value for
    * @param mappingFunction the function used to compute the new value

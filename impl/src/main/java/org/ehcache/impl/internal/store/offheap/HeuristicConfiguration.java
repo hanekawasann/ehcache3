@@ -57,12 +57,14 @@ public class HeuristicConfiguration {
     }
     this.maximumSize = maximumSize;
 
+    // yukms TODO: 系统配置项aggressive
     if (getAdvancedBooleanConfigProperty("aggressive", false)) {
       this.idealMaxSegmentSize = (int) getAdvancedMemorySizeConfigProperty("idealMaxSegmentSize", IDEAL_MAX_SEGMENT_SIZE);
       this.maximumChunkSize = (int) getAdvancedMemorySizeConfigProperty("maximumChunkSize", MAXIMUM_CHUNK_SIZE);
       this.minimumSegmentCount = (int) getAdvancedMemorySizeConfigProperty("minimumSegmentCount", MINIMUM_SEGMENT_COUNT);
       this.maximumSegmentCount = (int) getAdvancedMemorySizeConfigProperty("maximumSegmentCount", MAXIMUM_SEGMENT_COUNT);
       this.maximalSegmentSizeRatio = (int) getAdvancedMemorySizeConfigProperty("maximalSegmentSizeRatio", MAXIMAL_SEGMENT_SIZE_RATIO);
+      // yukms TODO: 不同点
       this.initialSegmentSizeRatio = (int) getAdvancedMemorySizeConfigProperty("initialSegmentSizeRatio", AGGRESSIVE_INITIAL_SEGMENT_SIZE_RATIO);
       this.assumedKeyValueSize = (int) getAdvancedMemorySizeConfigProperty("assumedKeyValueSize", ASSUMED_KEY_VALUE_SIZE);
     } else {
@@ -71,6 +73,7 @@ public class HeuristicConfiguration {
       this.minimumSegmentCount = (int) getAdvancedMemorySizeConfigProperty("minimumSegmentCount", MINIMUM_SEGMENT_COUNT);
       this.maximumSegmentCount = (int) getAdvancedMemorySizeConfigProperty("maximumSegmentCount", MAXIMUM_SEGMENT_COUNT);
       this.maximalSegmentSizeRatio = (int) getAdvancedMemorySizeConfigProperty("maximalSegmentSizeRatio", MAXIMAL_SEGMENT_SIZE_RATIO);
+      // yukms TODO: 不同点
       this.initialSegmentSizeRatio = (int) getAdvancedMemorySizeConfigProperty("initialSegmentSizeRatio", INITIAL_SEGMENT_SIZE_RATIO);
       this.assumedKeyValueSize = (int) getAdvancedMemorySizeConfigProperty("assumedKeyValueSize", ASSUMED_KEY_VALUE_SIZE);
     }

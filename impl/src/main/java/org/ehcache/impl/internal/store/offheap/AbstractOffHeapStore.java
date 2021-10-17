@@ -228,6 +228,7 @@ public abstract class AbstractOffHeapStore<K, V> extends BaseStore<K, V> impleme
 
     final AtomicBoolean put = new AtomicBoolean();
     // yukms TODO: org.ehcache.impl.internal.events.ThreadLocalStoreEventDispatcher
+    // yukms TODO: 创建事件接收器
     final StoreEventSink<K, V> eventSink = eventDispatcher.eventSink();
 
     final long now = timeSource.getTimeMillis();
@@ -235,7 +236,7 @@ public abstract class AbstractOffHeapStore<K, V> extends BaseStore<K, V> impleme
       BiFunction<K, OffHeapValueHolder<V>, OffHeapValueHolder<V>> mappingFunction = (mappedKey, mappedValue) -> {
 
         if (mappedValue != null && mappedValue.isExpired(now)) {
-          // yukms TODO: 已过期
+          // yukms TODO: 旧值已过期
           mappedValue = null;
         }
 
@@ -245,13 +246,15 @@ public abstract class AbstractOffHeapStore<K, V> extends BaseStore<K, V> impleme
           put.set(newValue != null);
           return newValue;
         } else {
-          // yukms TODO: 不过期修改
+          // yukms TODO: 不过期修改，mappedValue旧数据
           OffHeapValueHolder<V> newValue = newUpdatedValueHolder(key, value, mappedValue, now, eventSink);
           put.set(true);
           return newValue;
         }
       };
+      // yukms TODO: 计算映射并支持重试
       computeWithRetry(key, mappingFunction, false);
+      // yukms TODO: 释放事件接收器
       eventDispatcher.releaseEventSink(eventSink);
       if (put.get()) {
         putObserver.end(StoreOperationOutcomes.PutOutcome.PUT);
@@ -1032,18 +1035,25 @@ public abstract class AbstractOffHeapStore<K, V> extends BaseStore<K, V> impleme
   private OffHeapValueHolder<V> computeWithRetry(K key, BiFunction<K, OffHeapValueHolder<V>, OffHeapValueHolder<V>> computeFunction, boolean fault) throws StoreAccessException {
     OffHeapValueHolder<V> computeResult;
     try {
+      // yukms TODO: 获取映射
       computeResult = backingMap().compute(key, computeFunction, fault);
     } catch (OversizeMappingException ex) {
+      // yukms TODO: 超过映射大小
       try {
+        // yukms TODO: 关闭驱逐
         evictionAdvisor().setSwitchedOn(false);
+        // yukms TODO: 检测失效
         invokeValve();
+        // yukms TODO: 重试
         computeResult = backingMap().compute(key, computeFunction, fault);
       } catch (OversizeMappingException e) {
+        // yukms TODO: 驱逐后依然失效
         throw new StoreAccessException("The element with key '" + key + "' is too large to be stored"
                                        + " in this offheap store.", e);
       } catch (RuntimeException e) {
         throw handleException(e);
       } finally {
+        // yukms TODO: 开启驱逐
         evictionAdvisor().setSwitchedOn(true);
       }
     } catch (RuntimeException re) {
@@ -1078,6 +1088,7 @@ public abstract class AbstractOffHeapStore<K, V> extends BaseStore<K, V> impleme
   }
 
   private OffHeapValueHolder<V> newUpdatedValueHolder(K key, V value, OffHeapValueHolder<V> existing, long now, StoreEventSink<K, V> eventSink) {
+    // yukms TODO: 更新事件
     eventSink.updated(key, existing, value);
     Duration duration = Duration.ZERO;
     try {
@@ -1088,16 +1099,20 @@ public abstract class AbstractOffHeapStore<K, V> extends BaseStore<K, V> impleme
     } catch (RuntimeException re) {
       LOG.error("Expiry computation caused an exception - Expiry duration will be 0 ", re);
     }
+    // yukms TODO: 已过期
     if (Duration.ZERO.equals(duration)) {
       eventSink.expired(key, () -> value);
       return null;
     }
 
     if (duration == null) {
+      // yukms TODO: 没有过期已上一个值为准
       return new BasicOffHeapValueHolder<>(backingMap().nextIdFor(key), value, now, existing.expirationTime());
     } else if (isExpiryDurationInfinite(duration)) {
+      // yukms TODO: 不过期
       return new BasicOffHeapValueHolder<>(backingMap().nextIdFor(key), value, now, OffHeapValueHolder.NO_EXPIRE);
     } else {
+      // yukms TODO: 设置过期时间
       return new BasicOffHeapValueHolder<>(backingMap().nextIdFor(key), value, now, ExpiryUtils.getExpirationMillis(now, duration));
     }
   }
@@ -1111,10 +1126,13 @@ public abstract class AbstractOffHeapStore<K, V> extends BaseStore<K, V> impleme
       return null;
     }
 
+    // yukms TODO: 创建事件
     eventSink.created(key, value);
 
+    // yukms TODO: 计算过期时间
     long expirationTime = isExpiryDurationInfinite(duration) ? ValueHolder.NO_EXPIRE : ExpiryUtils.getExpirationMillis(now, duration);
 
+    // yukms TODO: org.ehcache.impl.internal.store.disk.EhcachePersistentConcurrentOffHeapClockCache
     return new BasicOffHeapValueHolder<>(backingMap().nextIdFor(key), value, now, expirationTime);
   }
 

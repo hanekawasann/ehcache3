@@ -40,6 +40,7 @@ public interface AuthoritativeTier<K, V> extends Store<K, V> {
 
   /**
    * Marks the mapping as not evictable and returns it atomically.
+   * 将映射标记为不可逐出，并以原子方式返回它。
    *
    * @return the value holder
    *
@@ -49,6 +50,7 @@ public interface AuthoritativeTier<K, V> extends Store<K, V> {
 
   /**
    * Marks the mapping as not evictable and performs computeIfAbsent() atomically.
+   * 将映射标记为不可逐出，并以原子方式执行ComputeFabSent（）。
    *
    * @return the value holder.
    *
@@ -59,6 +61,7 @@ public interface AuthoritativeTier<K, V> extends Store<K, V> {
   /**
    * This marks a mapping as evictable again if it matches the {@link org.ehcache.core.spi.store.Store.ValueHolder}
    * received.
+   * 如果映射与接收到的{@link org.ehcache.core.spi.store.store.ValueHolder}匹配，则会再次将其标记为可收回。
    *
    * @return {@code true} if a mapping exists for that key, the mapping was faulted, and the value of the
    * {@code ValueHolder} is equal to the value of the mapping in the {@code AuthoritativeTier}, {@code false} otherwise
@@ -69,9 +72,11 @@ public interface AuthoritativeTier<K, V> extends Store<K, V> {
 
   /**
    * Sets the {@link InvalidationValve} to be used by this {@code AuthoritativeTier}.
+   * 设置此{@code authoritivetier}要使用的{@link InvalidationValve}。
    * <p>
    * The invalidation valve provides a way for the {@code AuthoritativeTier} to force invalidation of
    * {@link CachingTier} entries when that is required.
+   * 失效阀为{@code authoritivetier}提供了一种在需要时强制{@link CachingTier}项失效的方法。
    *
    * @param valve the valve to use for triggering invalidations
    */
@@ -79,12 +84,14 @@ public interface AuthoritativeTier<K, V> extends Store<K, V> {
 
   /**
    * Invalidation valve, that is the mechanism through which an {@link AuthoritativeTier} can request invalidations
+   * 失效阀，即{@link AuthoritativeTier}可以请求失效的机制
    * from the {@link CachingTier}.
    */
   interface InvalidationValve {
 
     /**
      * Requests an invalidation of all {@link CachingTier} mappings.
+     * 请求所有{@link CachingTier}映射失效。
      *
      * @throws StoreAccessException when en error occurs while invalidating mappings
      */
@@ -92,6 +99,7 @@ public interface AuthoritativeTier<K, V> extends Store<K, V> {
 
     /**
      * Requests an invalidation of all {@link CachingTier} mappings whose key's hashcode matches the provided one.
+     * 请求所有{@link CachingTier}映射的失效，这些映射的密钥哈希代码与提供的哈希代码匹配。
      *
      * @throws StoreAccessException when en error occurs while invalidating mappings
      */

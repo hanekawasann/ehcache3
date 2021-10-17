@@ -26,6 +26,7 @@ public interface StoreEventSink<K, V> {
 
   /**
    * Indicates the mapping was removed.
+   * 指示已删除映射。
    *
    * @param key removed key
    * @param value value supplier of removed value
@@ -34,6 +35,7 @@ public interface StoreEventSink<K, V> {
 
   /**
    * Indicates the mapping was updated.
+   * 指示映射已更新。
    *
    * @param key the updated key
    * @param oldValue value supplier of old value
@@ -43,6 +45,7 @@ public interface StoreEventSink<K, V> {
 
   /**
    * Indicates the mapping was expired.
+   * 指示映射已过期。
    *
    * @param key the expired key
    * @param value value supplier of expired value
@@ -51,6 +54,7 @@ public interface StoreEventSink<K, V> {
 
   /**
    * Indicates a mapping was created.
+   * 指示已创建映射。
    *
    * @param key the created key
    * @param value the created value
@@ -59,6 +63,7 @@ public interface StoreEventSink<K, V> {
 
   /**
    * Indicates a mapping was evicted.
+   * 指示已逐出映射。
    *
    * @param key the evicted key
    * @param value value supplier of evicted value
