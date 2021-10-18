@@ -702,12 +702,13 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
 
       long now = timeSource.getTimeMillis();
       if (cachedValue == null) {
-        // yukms TODO: 未获取到
+        // yukms TODO: 放置占位符
         Fault<V> fault = new Fault<>(() -> source.apply(key));
         cachedValue = backEnd.putIfAbsent(key, fault);
 
+        // yukms TODO: 占位符放置成功
         if (cachedValue == null) {
-          // yukms TODO: backEnd不存在该值，放置成功
+          // yukms TODO: 处理占位符数据
           return resolveFault(key, backEnd, now, fault);
         }
       }
@@ -831,6 +832,7 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
       // yukms TODO: mappedValue为旧值
       if(mappedValue.equals(fault)) {
         try {
+          // yukms TODO: 通知过期
           invalidationListener.onInvalidation(key, cloneValueHolder(key, value, now, expiration, false));
         } catch (LimitExceededException ex) {
           throw new AssertionError("Sizing is not expected to happen.");
@@ -1494,6 +1496,7 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
     }
 
     try{
+      // yukms TODO: 未过期
       return cloneValueHolder(key, valueHolder, now, expiration, true);
     } catch (LimitExceededException e) {
       LOG.warn(e.getMessage());
