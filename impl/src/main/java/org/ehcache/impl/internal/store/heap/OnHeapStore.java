@@ -697,20 +697,25 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
       Backend<K, V> backEnd = map;
 
       // First try to find the value from heap
+      // yukms TODO: 首先尝试从堆中查找值
       OnHeapValueHolder<V> cachedValue = backEnd.get(key);
 
       long now = timeSource.getTimeMillis();
       if (cachedValue == null) {
+        // yukms TODO: 未获取到
         Fault<V> fault = new Fault<>(() -> source.apply(key));
         cachedValue = backEnd.putIfAbsent(key, fault);
 
         if (cachedValue == null) {
+          // yukms TODO: backEnd不存在该值，放置成功
           return resolveFault(key, backEnd, now, fault);
         }
       }
 
       // If we have a real value (not a fault), we make sure it is not expired
+      // yukms TODO: 如果我们有一个真实值（不是占位符），我们会确保它没有过期
       // If yes, we remove it and ask the source just in case. If no, we return it (below)
+      // yukms TODO: 如果是，我们将其删除并询问来源，以防万一。如果没有，我们将其退回（如下）
       if (!(cachedValue instanceof Fault)) {
         if (cachedValue.isExpired(now)) {
           expireMappingUnderLock(key, cachedValue);
@@ -766,12 +771,16 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
 
   private ValueHolder<V> resolveFault(K key, Backend<K, V> backEnd, long now, Fault<V> fault) throws StoreAccessException {
     try {
+      // yukms TODO: 获取ValueHolder
       ValueHolder<V> value = fault.getValueHolder();
       OnHeapValueHolder<V> newValue;
       if(value != null) {
+        // yukms TODO: 获取到了值
+        // yukms TODO: 从较低层导入值
         newValue = importValueFromLowerTier(key, value, now, backEnd, fault);
         if (newValue == null) {
           // Inline expiry or sizing failure
+          // yukms TODO: 内联失效或大小调整失败
           backEnd.remove(key, fault);
           getOrComputeIfAbsentObserver.end(CachingTierOperationOutcomes.GetOrComputeIfAbsentOutcome.FAULT_FAILED);
           return value;
@@ -819,6 +828,7 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
 
   private void invalidateInGetOrComputeIfAbsent(Backend<K, V> map, K key, ValueHolder<V> value, Fault<V> fault, long now, Duration expiration) {
     map.computeIfPresent(key, (mappedKey, mappedValue) -> {
+      // yukms TODO: mappedValue为旧值
       if(mappedValue.equals(fault)) {
         try {
           invalidationListener.onInvalidation(key, cloneValueHolder(key, value, now, expiration, false));
@@ -985,6 +995,7 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
 
   /**
    * Place holder used when loading an entry from the authority into this caching tier
+   * 将权限中的条目加载到此缓存层时使用的占位符
    *
    * @param <V> the value type of the caching tier
    */
@@ -1472,9 +1483,11 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
   }
 
   private OnHeapValueHolder<V> importValueFromLowerTier(K key, ValueHolder<V> valueHolder, long now, Backend<K, V> backEnd, Fault<V> fault) {
+    // yukms TODO: 获取剩余过期时间
     Duration expiration = strategy.getAccessDuration(key, valueHolder);
 
     if (Duration.ZERO.equals(expiration)) {
+      // yukms TODO: 已过期
       invalidateInGetOrComputeIfAbsent(backEnd, key, valueHolder, fault, now, Duration.ZERO);
       getOrComputeIfAbsentObserver.end(CachingTierOperationOutcomes.GetOrComputeIfAbsentOutcome.FAULT_FAILED);
       return null;

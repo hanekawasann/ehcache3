@@ -88,6 +88,7 @@ public class TieredStore<K, V> implements Store<K, V> {
     try {
       return cachingTier().getOrComputeIfAbsent(key, keyParam -> {
         try {
+          // yukms TODO: cachingTier未获取到
           return authoritativeTier.getAndFault(keyParam);
         } catch (StoreAccessException cae) {
           throw new StorePassThroughException(cae);

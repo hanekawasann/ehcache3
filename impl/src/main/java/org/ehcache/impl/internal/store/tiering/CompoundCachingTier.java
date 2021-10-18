@@ -100,13 +100,17 @@ public class CompoundCachingTier<K, V> implements CachingTier<K, V> {
   @Override
   public Store.ValueHolder<V> getOrComputeIfAbsent(K key, final Function<K, Store.ValueHolder<V>> source) throws StoreAccessException {
     try {
+      // yukms TODO: 先用高层
       return higher.getOrComputeIfAbsent(key, keyParam -> {
         try {
+          // yukms TODO: 再用低层
           Store.ValueHolder<V> valueHolder = lower.getAndRemove(keyParam);
           if (valueHolder != null) {
+            // yukms TODO: 获取到值
             return valueHolder;
           }
 
+          // yukms TODO: 另外获取
           return source.apply(keyParam);
         } catch (StoreAccessException cae) {
           throw new ComputationException(cae);
