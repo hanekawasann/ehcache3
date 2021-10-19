@@ -46,6 +46,7 @@ public interface Serializer<T> {
 
   /**
    * Transforms the given instance into its serial form.
+   * 将给定实例转换为其序列形式。
    *
    * @param object the instance to serialize
    *
@@ -57,6 +58,7 @@ public interface Serializer<T> {
 
   /**
    * Reconstructs an instance from the given serial form.
+   * 从给定的序列形式重建实例。
    *
    * @param binary the binary representation of the serial form
    *
@@ -69,6 +71,7 @@ public interface Serializer<T> {
 
   /**
    * Checks if the given instance and serial form {@link Object#equals(Object) represent} the same instance.
+   * 检查给定实例和序列形式{@link Object#equals(Object) 是否表示}相同的实例。
    *
    * @param object the instance to check
    * @param binary the serial form to check

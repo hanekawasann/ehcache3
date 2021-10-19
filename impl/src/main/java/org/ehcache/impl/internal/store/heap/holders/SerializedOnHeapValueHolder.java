@@ -37,6 +37,7 @@ public class SerializedOnHeapValueHolder<V> extends OnHeapValueHolder<V> impleme
       throw new NullPointerException("null serializer");
     }
     this.serializer = serializer;
+    // yukms TODO: 序列化为ByteBuffer
     this.buffer = serializer.serialize(value).asReadOnlyBuffer();
   }
 
@@ -57,6 +58,7 @@ public class SerializedOnHeapValueHolder<V> extends OnHeapValueHolder<V> impleme
     super(valueHolder.getId(), valueHolder.creationTime(), valueHolder.expirationTime(), evictionAdvice);
     this.buffer = binaryValue;
     this.serializer = serializer;
+    // yukms TODO: 设置过期时间
     this.accessed(now, expiration);
   }
 

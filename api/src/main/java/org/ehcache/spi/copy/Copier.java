@@ -34,6 +34,7 @@ public interface Copier<T> {
    * Creates a copy of the instance passed in.
    * <p>
    * This method is invoked as a value is read from the cache.
+   * 创建传入实例的副本<p> 从缓存中读取值时调用此方法。
    *
    * @param obj the instance to copy
    * @return the copy of the {@code obj} instance
@@ -44,6 +45,7 @@ public interface Copier<T> {
    * Creates a copy of the instance passed in.
    * <p>
    * This method is invoked as a value is written to the cache.
+   * 创建传入实例的副本<p> 将值写入缓存时调用此方法。
    *
    * @param obj the instance to copy
    * @return the copy of the {@code obj} instance

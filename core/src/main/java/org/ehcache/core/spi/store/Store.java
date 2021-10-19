@@ -492,6 +492,7 @@ public interface Store<K, V> extends ConfigurationChangeSupport {
 
   /**
    * Holds both a value, and all the metadata associated with a mapping in a Store.
+   * 保存一个值以及与存储中的映射关联的所有元数据。
    *
    * @param <V> the value type
    */
@@ -499,11 +500,13 @@ public interface Store<K, V> extends ConfigurationChangeSupport {
 
     /**
      * Constant value indicating no expiration - an eternal mapping.
+     * 表示无过期的常量值-永久映射。
      */
     long NO_EXPIRE = -1;
 
     /**
      * Accessor to the creation time of this ValueHolder
+     * 访问此值持有人的创建时间
      *
      * @return the creation time in milliseconds
      */
@@ -511,6 +514,7 @@ public interface Store<K, V> extends ConfigurationChangeSupport {
 
     /**
      * Accessor to the expiration time of this ValueHolder
+     * 访问此价值持有人的到期时间
      *
      * @return the expiration time in milliseconds. A value of {@link #NO_EXPIRE} means that the ValueHolder will never expire.
      */
@@ -518,6 +522,7 @@ public interface Store<K, V> extends ConfigurationChangeSupport {
 
     /**
      * Check if the ValueHolder is expired relative to the specified time
+     * 检查持票人是否在指定时间内到期
      *
      * @param expirationTime the expiration time (in ms) relative to which the expiry check must be made
      * @return true if the ValueHolder expired relative to the given expiration time
@@ -526,6 +531,7 @@ public interface Store<K, V> extends ConfigurationChangeSupport {
 
     /**
      * Accessor to the last access time of the Value held in this ValueHolder
+     * 访问人访问此值持有人持有的值的最后访问时间
      *
      * @return the last access time in milliseconds
      */
@@ -534,6 +540,7 @@ public interface Store<K, V> extends ConfigurationChangeSupport {
     /**
      * The combination of this identifier and the <code>key</code> that ValueHolder is mapped to should to be
      * unique at a given time.
+     * 此标识符和值持有人映射到的<code>键<code>的组合在给定时间应该是唯一的。
      *
      * @return a unique identifier
      *
@@ -542,6 +549,7 @@ public interface Store<K, V> extends ConfigurationChangeSupport {
 
     /**
      * Returns the value held by this value holder. This value can't be {@code null}.
+     * 返回此值持有者持有的值。此值不能为{@code null}。
      *
      * @return the value held
      */

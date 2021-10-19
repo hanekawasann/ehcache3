@@ -71,6 +71,7 @@ interface Backend<K, V> {
 
   /**
    * Returns the natural size, that is byte sized if configured, count size otherwise.
+   * 返回自然大小，即字节大小（如果已配置），否则返回计数大小。
    *
    * @return the natural size
    */

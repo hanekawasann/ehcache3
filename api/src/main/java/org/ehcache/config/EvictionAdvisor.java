@@ -35,7 +35,7 @@ public interface EvictionAdvisor<K, V> {
    *
    * @param key the cache key
    * @param value the cache value
-   * @return {@code true} if eviction should be avoided, {@code false} otherwise
+   * @return {@code true} if eviction should be avoided, {@code false} otherwise {@code true}如果应该避免逐出，则{@code false}否则
    */
   boolean adviseAgainstEviction(K key, V value);
 }
