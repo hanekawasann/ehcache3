@@ -118,7 +118,9 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
 
   private static final Logger LOG = LoggerFactory.getLogger(OnHeapStore.class);
 
+  // yukms TODO: 尝试驱逐次数
   private static final int ATTEMPT_RATIO = 4;
+  // yukms TODO: 驱逐成功次数
   private static final int EVICTION_RATIO = 2;
 
   private static final EvictionAdvisor<Object, OnHeapValueHolder<?>> EVICTION_ADVISOR = (key, value) -> value.evictionAdvice();
@@ -782,23 +784,30 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
         if (newValue == null) {
           // Inline expiry or sizing failure
           // yukms TODO: 内联失效或大小调整失败
+          // yukms TODO: 移除占位符
           backEnd.remove(key, fault);
           getOrComputeIfAbsentObserver.end(CachingTierOperationOutcomes.GetOrComputeIfAbsentOutcome.FAULT_FAILED);
+          // yukms TODO: 过期还返回？？？
           return value;
         }
       } else {
+        // yukms TODO: 没有获取到值，移除占位符
         backEnd.remove(key, fault);
         getOrComputeIfAbsentObserver.end(CachingTierOperationOutcomes.GetOrComputeIfAbsentOutcome.MISS);
         return null;
       }
 
+      // yukms TODO: 获取到值且未过期
       if (backEnd.replace(key, fault, newValue)) {
+        // yukms TODO: 替换成功
         getOrComputeIfAbsentObserver.end(CachingTierOperationOutcomes.GetOrComputeIfAbsentOutcome.FAULTED);
+        // yukms TODO: 更新大小
         updateUsageInBytesIfRequired(newValue.size());
         enforceCapacity();
         return newValue;
       }
 
+      // yukms TODO: 替换失败
       AtomicReference<ValueHolder<V>> invalidatedValue = new AtomicReference<>();
       backEnd.computeIfPresent(key, (mappedKey, mappedValue) -> {
         notifyInvalidation(key, mappedValue);
@@ -1489,19 +1498,22 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
     Duration expiration = strategy.getAccessDuration(key, valueHolder);
 
     if (Duration.ZERO.equals(expiration)) {
-      // yukms TODO: 已过期
+      // yukms TODO: 已过期则通知
       invalidateInGetOrComputeIfAbsent(backEnd, key, valueHolder, fault, now, Duration.ZERO);
       getOrComputeIfAbsentObserver.end(CachingTierOperationOutcomes.GetOrComputeIfAbsentOutcome.FAULT_FAILED);
+      // yukms TODO: 返回null
       return null;
     }
 
     try{
-      // yukms TODO: 未过期
+      // yukms TODO: 未过期则拷贝返回
       return cloneValueHolder(key, valueHolder, now, expiration, true);
     } catch (LimitExceededException e) {
       LOG.warn(e.getMessage());
+      // yukms TODO: 拷贝过程中过期则通知
       invalidateInGetOrComputeIfAbsent(backEnd, key, valueHolder, fault, now, expiration);
       getOrComputeIfAbsentObserver.end(CachingTierOperationOutcomes.GetOrComputeIfAbsentOutcome.FAULT_FAILED);
+      // yukms TODO: 返回null
       return null;
     }
   }
@@ -1511,16 +1523,21 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
     boolean evictionAdvice = checkEvictionAdvice(key, realValue);
     OnHeapValueHolder<V> clonedValueHolder;
     if(valueCopier instanceof SerializingCopier) {
+      // yukms TODO: 通过序列化复制
       if (valueHolder instanceof BinaryValueHolder && ((BinaryValueHolder) valueHolder).isBinaryValueAvailable()) {
+        // yukms TODO: BinaryValueHolder可以访问，则直接获取二进制数据
         clonedValueHolder = new SerializedOnHeapValueHolder<>(valueHolder, ((BinaryValueHolder) valueHolder).getBinaryValue(),
           evictionAdvice, ((SerializingCopier<V>) valueCopier).getSerializer(), now, expiration);
       } else {
+        // yukms TODO: 否则序列化
         clonedValueHolder = new SerializedOnHeapValueHolder<>(valueHolder, realValue, evictionAdvice,
           ((SerializingCopier<V>) valueCopier).getSerializer(), now, expiration);
       }
     } else {
+      // yukms TODO: valueCopier
       clonedValueHolder = new CopiedOnHeapValueHolder<>(valueHolder, realValue, evictionAdvice, valueCopier, now, expiration);
     }
+    // yukms TODO: 获取大小
     if (sizingEnabled) {
       clonedValueHolder.setSize(getSizeOfKeyValuePairs(key, clonedValueHolder));
     }
@@ -1583,24 +1600,31 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
 
   /**
    * Try to evict a mapping.
+   * 尝试逐出映射。
+   *
    * @return true if a mapping was evicted, false otherwise.
    * @param eventSink target of eviction event
    */
   boolean evict(StoreEventSink<K, V> eventSink) {
     evictionObserver.begin();
+    // yukms TODO: 随机
     Random random = new Random();
 
     @SuppressWarnings("unchecked")
+    // yukms TODO: 获得驱逐候选人
     Map.Entry<K, OnHeapValueHolder<V>> candidate = map.getEvictionCandidate(random, SAMPLE_SIZE, EVICTION_PRIORITIZER, EVICTION_ADVISOR);
 
     if (candidate == null) {
       // 2nd attempt without any advisor
+      // yukms TODO: 在没有任何顾问的情况下进行第二次尝试
       candidate = map.getEvictionCandidate(random, SAMPLE_SIZE, EVICTION_PRIORITIZER, noAdvice());
     }
 
     if (candidate == null) {
+      // yukms TODO: 两次都没有找到驱逐候选人，不找了
       return false;
     } else {
+      // yukms TODO: 找到驱逐候选人
       Map.Entry<K, OnHeapValueHolder<V>> evictionCandidate = candidate;
       AtomicBoolean removed = new AtomicBoolean(false);
       map.computeIfPresent(evictionCandidate.getKey(), (mappedKey, mappedValue) -> {
@@ -1616,9 +1640,11 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
         return mappedValue;
       });
       if (removed.get()) {
+        // yukms TODO: 驱逐成功
         evictionObserver.end(StoreOperationOutcomes.EvictionOutcome.SUCCESS);
         return true;
       } else {
+        // yukms TODO: 驱逐失败
         evictionObserver.end(StoreOperationOutcomes.EvictionOutcome.FAILURE);
         return false;
       }
