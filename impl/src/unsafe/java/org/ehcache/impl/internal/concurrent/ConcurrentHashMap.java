@@ -1132,6 +1132,9 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
      * Implementation for the four public remove/replace methods:
      * Replaces node value with v, conditional upon match of cv if
      * non-null.  If resulting value is null, delete.
+     * 四种公共remove replace方法的实现：
+     * 将节点值替换为v，如果不为null，则以cv匹配为条件。
+     * 如果结果值为null，则删除。
      */
     final V replaceNode(Object key, V value, Object cv) {
         int hash = spread(key.hashCode());

@@ -103,7 +103,7 @@ public class CompoundCachingTier<K, V> implements CachingTier<K, V> {
       // yukms TODO: 先用高层
       return higher.getOrComputeIfAbsent(key, keyParam -> {
         try {
-          // yukms TODO: 再用低层
+          // yukms TODO: 从底层转移到高层（getAndRemove）
           Store.ValueHolder<V> valueHolder = lower.getAndRemove(keyParam);
           if (valueHolder != null) {
             // yukms TODO: 获取到值

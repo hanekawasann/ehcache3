@@ -976,22 +976,30 @@ public abstract class AbstractOffHeapStore<K, V> extends BaseStore<K, V> impleme
     BiFunction<K, OffHeapValueHolder<V>, OffHeapValueHolder<V>> computeFunction = (mappedKey, mappedValue) -> {
       long now = timeSource.getTimeMillis();
       if (mappedValue == null || mappedValue.isExpired(now)) {
+        // yukms TODO: 过期
         if (mappedValue != null) {
+          // yukms TODO: 通知过期
           onExpirationInCachingTier(mappedValue, key);
         }
         return null;
       }
+      // yukms TODO: 不为null且未过期
+      // yukms TODO: 这是什么？？？
       mappedValue.detach();
       valueHolderAtomicReference.set(mappedValue);
+      // yukms TODO: 清空该层数据
       return null;
     };
 
     try {
+      // yukms TODO: 处理数据
       backingMap().compute(key, computeFunction, false);
       ValueHolder<V> result = valueHolderAtomicReference.get();
       if (result == null) {
+        // yukms TODO: 未获取到数据
         getAndRemoveObserver.end(LowerCachingTierOperationsOutcome.GetAndRemoveOutcome.MISS);
       } else {
+        // yukms TODO: 获取到数据
         getAndRemoveObserver.end(LowerCachingTierOperationsOutcome.GetAndRemoveOutcome.HIT_REMOVED);
       }
       return result;

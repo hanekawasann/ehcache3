@@ -120,7 +120,7 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
 
   // yukms TODO: 尝试驱逐次数
   private static final int ATTEMPT_RATIO = 4;
-  // yukms TODO: 驱逐成功次数
+  // yukms TODO: 驱逐数
   private static final int EVICTION_RATIO = 2;
 
   private static final EvictionAdvisor<Object, OnHeapValueHolder<?>> EVICTION_ADVISOR = (key, value) -> value.evictionAdvice();
@@ -704,6 +704,7 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
 
       long now = timeSource.getTimeMillis();
       if (cachedValue == null) {
+        // yukms TODO: 堆中未找到
         // yukms TODO: 放置占位符
         Fault<V> fault = new Fault<>(() -> source.apply(key));
         cachedValue = backEnd.putIfAbsent(key, fault);
@@ -720,18 +721,23 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
       // If yes, we remove it and ask the source just in case. If no, we return it (below)
       // yukms TODO: 如果是，我们将其删除并询问来源，以防万一。如果没有，我们将其退回（如下）
       if (!(cachedValue instanceof Fault)) {
+        // yukms TODO: 不是占位符
         if (cachedValue.isExpired(now)) {
+          // yukms TODO: 过期则移除该值
           expireMappingUnderLock(key, cachedValue);
 
           // On expiration, we might still be able to get a value from the fault. For instance, when a load-writer is used
+          // yukms TODO: 到期时，我们可能仍然能够从错误中获取值。例如，当使用load writer时
           Fault<V> fault = new Fault<>(() -> source.apply(key));
           cachedValue = backEnd.putIfAbsent(key, fault);
 
           if (cachedValue == null) {
+            // yukms TODO: 获取到值则返回
             return resolveFault(key, backEnd, now, fault);
           }
         }
         else {
+          // yukms TODO: 没过期，更新过期时间
           strategy.setAccessAndExpiryTimeWhenCallerOutsideLock(key, cachedValue, now);
         }
       }
@@ -739,6 +745,8 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
       getOrComputeIfAbsentObserver.end(CachingTierOperationOutcomes.GetOrComputeIfAbsentOutcome.HIT);
 
       // Return the value that we found in the cache (by getting the fault or just returning the plain value depending on what we found)
+      // yukms TODO: 返回我们在缓存中找到的值（通过获取错误或仅返回普通值，具体取决于我们找到的内容）
+      // yukms TODO: 获取数据
       return getValue(cachedValue);
     } catch (RuntimeException re) {
       throw handleException(re);
@@ -797,21 +805,26 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
         return null;
       }
 
-      // yukms TODO: 获取到值且未过期
+      // yukms TODO: 获取到值且未过期，将占位符替换为真实值
       if (backEnd.replace(key, fault, newValue)) {
         // yukms TODO: 替换成功
         getOrComputeIfAbsentObserver.end(CachingTierOperationOutcomes.GetOrComputeIfAbsentOutcome.FAULTED);
         // yukms TODO: 更新大小
         updateUsageInBytesIfRequired(newValue.size());
+        // yukms TODO: 强制驱逐
         enforceCapacity();
+        // yukms TODO: 返回新值
         return newValue;
       }
 
       // yukms TODO: 替换失败
+      // yukms TODO: 可能情况有：key不存在；value已经被替换；这两种情况为什么要将该值移除呢？？？
       AtomicReference<ValueHolder<V>> invalidatedValue = new AtomicReference<>();
       backEnd.computeIfPresent(key, (mappedKey, mappedValue) -> {
+        // yukms TODO: 通知无效
         notifyInvalidation(key, mappedValue);
         invalidatedValue.set(mappedValue);
+        // yukms TODO: 减少大小
         updateUsageInBytesIfRequired(mappedValue.size());
         return null;
       });
@@ -819,10 +832,12 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
       ValueHolder<V> p = getValue(invalidatedValue.get());
       if (p != null) {
         if (p.isExpired(now)) {
+          // yukms TODO: 已过期
           getOrComputeIfAbsentObserver.end(CachingTierOperationOutcomes.GetOrComputeIfAbsentOutcome.FAULT_FAILED_MISS);
           return null;
         }
 
+        // yukms TODO: 未过期
         getOrComputeIfAbsentObserver.end(CachingTierOperationOutcomes.GetOrComputeIfAbsentOutcome.FAULT_FAILED);
         return p;
       }
@@ -1585,14 +1600,18 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
   protected void enforceCapacity() {
     StoreEventSink<K, V> eventSink = storeEventDispatcher.eventSink();
     try {
+      // yukms TODO: 驱逐
       for (int attempts = 0, evicted = 0; attempts < ATTEMPT_RATIO && evicted < EVICTION_RATIO
               && capacity < map.naturalSize(); attempts++) {
+        // yukms TODO: 如果一直无法驱逐怎么办？？？
         if (evict(eventSink)) {
           evicted++;
         }
       }
+      // yukms TODO: 正常释放
       storeEventDispatcher.releaseEventSink(eventSink);
     } catch (RuntimeException re){
+      // yukms TODO: 失败释放
       storeEventDispatcher.releaseEventSinkAfterFailure(eventSink, re);
       throw re;
     }
@@ -1621,7 +1640,7 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
     }
 
     if (candidate == null) {
-      // yukms TODO: 两次都没有找到驱逐候选人，不找了
+      // yukms TODO: 两次都没有找到驱逐候选人，则驱逐失败
       return false;
     } else {
       // yukms TODO: 找到驱逐候选人
@@ -1629,12 +1648,17 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
       AtomicBoolean removed = new AtomicBoolean(false);
       map.computeIfPresent(evictionCandidate.getKey(), (mappedKey, mappedValue) -> {
         if (mappedValue.equals(evictionCandidate.getValue())) {
+          // yukms TODO: 该值还存在
           removed.set(true);
           if (!(evictionCandidate.getValue() instanceof Fault)) {
+            // yukms TODO: 如果不是占位符，则告知事件
             eventSink.evicted(evictionCandidate.getKey(), evictionCandidate.getValue());
+            // yukms TODO: 通知过期
             invalidationListener.onInvalidation(mappedKey, evictionCandidate.getValue());
           }
+          // yukms TODO: 减少大小
           updateUsageInBytesIfRequired(-mappedValue.size());
+          // yukms TODO: 值设置为null
           return null;
         }
         return mappedValue;

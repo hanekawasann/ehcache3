@@ -107,6 +107,7 @@ public class LazyOffHeapValueHolder<V> extends OffHeapValueHolder<V> implements 
 
   /**
    * Must be called under offheap lock, may read invalid memory content otherwise
+   * 必须在堆外锁下调用，否则可能读取无效内存内容
    */
   @Override
   void detach() {

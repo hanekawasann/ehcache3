@@ -39,6 +39,7 @@ import java.util.function.Supplier;
 
 /**
  * Backend dealing with a key copier and storing keys as {@code OnHeapKey<K>}
+ * 后端处理密钥复制器并将密钥存储为{@code OnHeapKey<K>}
  *
  * @param <K> the key type
  * @param <V> the value type
