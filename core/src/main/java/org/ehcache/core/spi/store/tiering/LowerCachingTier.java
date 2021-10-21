@@ -37,9 +37,11 @@ public interface LowerCachingTier<K, V> extends ConfigurationChangeSupport {
   /**
    * Either return the {@link org.ehcache.core.spi.store.Store.ValueHolder} currently in the caching tier
    * or installs and returns the result of the passed in function.
+   * 返回当前缓存层中的{@link org.ehcache.core.spi.store.Store.ValueHolder}，或者安装并返回传入函数的结果。
    * <p>
    * Note that in case of expired {@link org.ehcache.core.spi.store.Store.ValueHolder} {@code null} will be returned
    * and the mapping will be invalidated.
+   * 注意，在过期的情况下{@link org.ehcache.core.spi.store.Store.ValueHolder}{@code null}将被返回，映射将无效。
    *
    * @param key the key
    * @param source the function that computes the value
@@ -51,6 +53,7 @@ public interface LowerCachingTier<K, V> extends ConfigurationChangeSupport {
 
   /**
    * Return the value holder currently in this tier.
+   * 返回当前在此层中的值持有者。
    *
    * @param key the key
    * @return the value holder, or {@code null}
@@ -61,6 +64,7 @@ public interface LowerCachingTier<K, V> extends ConfigurationChangeSupport {
 
   /**
    * Return the value holder currently in this tier and removes it atomically.
+   * 返回当前在此层中的值持有者，并以原子方式将其删除。
    *
    * @param key the key
    * @return the value holder, or {@code null}
@@ -72,6 +76,7 @@ public interface LowerCachingTier<K, V> extends ConfigurationChangeSupport {
   /**
    * Removes a mapping, triggering the {@link org.ehcache.core.spi.store.tiering.CachingTier.InvalidationListener} if
    * registered.
+   * 删除映射，如果已注册，则触发{@link org.ehcache.core.spi.store.tiering.CachingTier.InvalidationListener}。
    *
    * @param key the key to remove
    *
@@ -82,6 +87,7 @@ public interface LowerCachingTier<K, V> extends ConfigurationChangeSupport {
   /**
    * Invalidates all mapping, invoking the {@link org.ehcache.core.spi.store.tiering.CachingTier.InvalidationListener} if
    * registered.
+   * 使所有映射无效，如果已注册，则调用{@link org.ehcache.core.spi.store.tiering.CachingTier.InvalidationListener}。
    *
    * @throws StoreAccessException if mappings cannot be removed
    */
@@ -90,6 +96,7 @@ public interface LowerCachingTier<K, V> extends ConfigurationChangeSupport {
   /**
    * Invalidates all mappings whose key's hash code matches the provided one, invoking the
    * {@link org.ehcache.core.spi.store.tiering.CachingTier.InvalidationListener} if registered.
+   * 如果已注册，则调用{@link org.ehcache.core.spi.store.tiering.CachingTier.InvalidationListener}，使其密钥的哈希代码与提供的哈希代码匹配的所有映射无效。
    *
    * @throws StoreAccessException if mappings cannot be removed
    */

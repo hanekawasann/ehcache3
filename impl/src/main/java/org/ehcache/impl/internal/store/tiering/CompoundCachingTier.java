@@ -147,8 +147,11 @@ public class CompoundCachingTier<K, V> implements CachingTier<K, V> {
       higher.silentInvalidate(key, mappedValue -> {
         try {
           if (mappedValue != null) {
+            // yukms TODO: 存在值
+            // yukms TODO: 通知过期
             notifyInvalidation(key, mappedValue);
           }  else {
+            // yukms TODO: 不存在值，
             lower.invalidate(key);
           }
         } catch (StoreAccessException cae) {

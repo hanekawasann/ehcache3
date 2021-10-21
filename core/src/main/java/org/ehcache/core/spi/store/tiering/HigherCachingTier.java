@@ -37,6 +37,7 @@ public interface HigherCachingTier<K, V> extends CachingTier<K, V> {
   /**
    * Removes a mapping without firing an invalidation event, then calls the function under the same lock scope
    * passing in the mapping or null if none was present.
+   * 在不触发失效事件的情况下删除映射，然后在传递映射的同一锁作用域下调用函数，如果不存在，则调用null。
    *
    * @param key the key
    * @param function the function to call
@@ -47,6 +48,7 @@ public interface HigherCachingTier<K, V> extends CachingTier<K, V> {
 
   /**
    * Removes all mappings without firing an invalidation event instead invoking the provided function.
+   * 删除所有映射，而不触发失效事件，而是调用提供的函数。
    *
    * @param biFunction the function to invoke for each mappings
    *
@@ -57,6 +59,7 @@ public interface HigherCachingTier<K, V> extends CachingTier<K, V> {
   /**
    * Remove all mappings whose key have the specified hash code without firing an invalidation event instead
    * invoking the provided function.
+   * 删除其密钥具有指定哈希代码的所有映射，而不触发失效事件，而是调用提供的函数。
    *
    * @throws StoreAccessException if mappings cannot be removed or the function throws
    */
