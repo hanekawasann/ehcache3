@@ -327,12 +327,15 @@ public abstract class AbstractOffHeapStore<K, V> extends BaseStore<K, V> impleme
       backingMap().computeIfPresent(key, (mappedKey, mappedValue) -> {
 
         if (mappedValue != null && mappedValue.isExpired(now)) {
+          // yukms TODO: 过期
           onExpiration(mappedKey, mappedValue, eventSink);
           return null;
         }
 
         if (mappedValue != null) {
+          // yukms TODO: 有值
           removed.set(true);
+          // yukms TODO: 移除时事件
           eventSink.removed(mappedKey, mappedValue);
         }
         return null;
@@ -341,8 +344,10 @@ public abstract class AbstractOffHeapStore<K, V> extends BaseStore<K, V> impleme
       eventDispatcher.releaseEventSink(eventSink);
 
       if (removed.get()) {
+        // yukms TODO: 移除成功
         removeObserver.end(StoreOperationOutcomes.RemoveOutcome.REMOVED);
       } else {
+        // yukms TODO: 移除失败
         removeObserver.end(StoreOperationOutcomes.RemoveOutcome.MISS);
       }
       return removed.get();
@@ -868,11 +873,16 @@ public abstract class AbstractOffHeapStore<K, V> extends BaseStore<K, V> impleme
     try {
       boolean result = backingMap().computeIfPinned(key, (k, valuePresent) -> {
         if (valuePresent.getId() == valueFlushed.getId()) {
+          // yukms TODO: 值还存在
           if (valueFlushed.isExpired(timeSource.getTimeMillis())) {
+            // yukms TODO: 已过期
             onExpiration(k, valuePresent, eventSink);
             return null;
           }
+          // yukms TODO: 未过期
+          // yukms TODO: ？？？
           valuePresent.updateMetadata(valueFlushed);
+          // yukms TODO: ？？？
           valuePresent.writeBack();
         }
         return valuePresent;
@@ -1050,7 +1060,7 @@ public abstract class AbstractOffHeapStore<K, V> extends BaseStore<K, V> impleme
       try {
         // yukms TODO: 关闭驱逐
         evictionAdvisor().setSwitchedOn(false);
-        // yukms TODO: 检测失效
+        // yukms TODO: 清空上层缓存
         invokeValve();
         // yukms TODO: 重试
         computeResult = backingMap().compute(key, computeFunction, fault);

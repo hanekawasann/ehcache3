@@ -128,6 +128,8 @@ public class OnHeapStore<K, V> extends BaseStore<K, V> implements HigherCachingT
   /**
    * Comparator for eviction candidates:
    * The highest priority is the ValueHolder having the smallest lastAccessTime.
+   * 逐出候选对象的比较：
+   * 最高优先级是具有最小lastAccessTime的ValueHolder。
    */
   private static final Comparator<ValueHolder<?>> EVICTION_PRIORITIZER = (t, u) -> {
     if (t instanceof Fault) {

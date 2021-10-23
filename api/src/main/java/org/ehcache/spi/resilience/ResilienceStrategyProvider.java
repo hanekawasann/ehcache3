@@ -22,16 +22,19 @@ import org.ehcache.spi.service.ServiceConfiguration;
 
 /**
  * A {@link Service} that creates {@link ResilienceStrategy} instances.
+ * 创建{@link ResilienceStrategy}实例的{@link Service}。
  * <p>
  * A {@code CacheManager} will use the {@link #createResilienceStrategy(String, CacheConfiguration, RecoveryStore)} and
  * {@link #createResilienceStrategy(String, CacheConfiguration, RecoveryStore, CacheLoaderWriter)} methods to create
  * {@code ResilienceStrategy} instances for each {@code Cache} it manages.
+ * {@code CacheManager}将使用{@link createResilienceStrategy（String，CacheConfiguration，RecoveryStore）}和{@link createResilienceStrategy（String，CacheConfiguration，RecoveryStore，CacheLoaderWriter）}方法为其管理的每个{@code Cache}创建{@code ResilienceStrategy}实例。
  */
 public interface ResilienceStrategyProvider extends Service {
 
   /**
    * Creates a {@code ResilienceStrategy} for the {@link org.ehcache.Cache Cache} with the given alias and configuration
    * using the given {@link RecoveryStore}.
+   * 使用给定的{@link RecoveryStore}为具有给定别名和配置的{@link org.ehcache.Cache Cache}创建{@code ResilienceStrategy}。
    *
    * @param alias the {@code Cache} alias in the {@code CacheManager}
    * @param configuration the configuration for the associated cache
@@ -46,6 +49,7 @@ public interface ResilienceStrategyProvider extends Service {
   /**
    * Creates a {@code ResilienceStrategy} for the {@link org.ehcache.Cache Cache} with the given alias and configuration
    * using the given {@link RecoveryStore} and {@link CacheLoaderWriter}
+   * 使用给定的{@link RecoveryStore}和{@link CacheLoaderWriter}为具有给定别名和配置的{@link org.ehcache.Cache Cache}创建{@code ResilienceStrategy}
    *
    * @param alias the {@code Cache} alias in the {@code CacheManager}
    * @param configuration the configuration for the associated cache

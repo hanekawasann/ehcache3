@@ -53,6 +53,7 @@ class SimpleBackend<K, V> implements Backend<K, V> {
 
   @Override
   public Map.Entry<K, OnHeapValueHolder<V>> getEvictionCandidate(Random random, int size, final Comparator<? super Store.ValueHolder<V>> prioritizer, final EvictionAdvisor<Object, ? super OnHeapValueHolder<?>> evictionAdvisor) {
+    // yukms TODO: 扩展方法
     return realMap.getEvictionCandidate(random, size, prioritizer, evictionAdvisor);
   }
 
@@ -109,6 +110,7 @@ class SimpleBackend<K, V> implements Backend<K, V> {
 
   @Override
   public Collection<Map.Entry<K, OnHeapValueHolder<V>>> removeAllWithHash(int hash) {
+    // yukms TODO: 扩展方法
     Collection<Map.Entry<K, OnHeapValueHolder<V>>> removed = realMap.removeAllWithHash(hash);
     if (byteSized) {
       long delta = 0L;

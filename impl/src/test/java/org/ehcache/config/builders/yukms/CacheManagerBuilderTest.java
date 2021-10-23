@@ -1,5 +1,9 @@
 package org.ehcache.config.builders.yukms;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.LineNumberReader;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
@@ -13,6 +17,7 @@ import org.ehcache.config.builders.ExpiryPolicyBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.config.units.MemoryUnit;
 import org.ehcache.core.EhcacheManager;
+import org.ehcache.core.internal.resilience.ThrowingResilienceStrategy;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -86,7 +91,42 @@ public class CacheManagerBuilderTest {
   }
 
   @Test
-  public void test_put() {
+  public void test_put() throws InterruptedException, FileNotFoundException {
+    CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()//
+      .withDefaultSizeOfMaxObjectGraph(111)//
+      .with(CacheManagerBuilder.persistence(getPath()))//
+      .build(true);
+    Cache<String, String> cache = cacheManager.createCache("cache_test",
+
+      CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
+        ResourcePoolsBuilder.newResourcePoolsBuilder()//
+          .heap(1, MemoryUnit.B)//
+          .offheap(1, MemoryUnit.MB)//
+          .disk(2, MemoryUnit.MB, true)//
+      )//
+        .withResilienceStrategy(new ThrowingResilienceStrategy<>())//
+      .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.of(1, ChronoUnit.SECONDS)))//
+    );
+    String key = "cache_test_key";
+    for (int i = 1; i <= 10_000_000; i++) {
+      //BufferedReader reader = new LineNumberReader(new FileReader("C:\\Users\\yukms\\Desktop\\value.txt"));
+      //String s1 = reader.lines().reduce((s, s2) -> s + s2).get();
+      try {
+        //cache.put("cache_test_key" + i, s1);
+        cache.put("cache_test_key" + i, "cache_test_key" + i);
+      } catch (Throwable e) {
+        e.fillInStackTrace();
+        throw e;
+      }
+    }
+    Thread.sleep(1000);
+    Assert.assertNull(cache.get(key));
+    Assert.assertNull(cache.get(key));
+    cache.remove(key);
+  }
+
+  @Test
+  public void test_put1() {
     CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()//
       .withDefaultSizeOfMaxObjectGraph(111)//
       .with(CacheManagerBuilder.persistence(getPath()))//
@@ -95,14 +135,14 @@ public class CacheManagerBuilderTest {
 
       CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
           ResourcePoolsBuilder.newResourcePoolsBuilder()//
-            .heap(2, MemoryUnit.MB)//
-            .offheap(4, MemoryUnit.MB)//
-            .disk(8, MemoryUnit.MB, true))//
-        //.withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.of(1, ChronoUnit.HOURS)))//
+            .heap(1, MemoryUnit.B)//
+          //.offheap(1, MemoryUnit.MB)//
+          //.disk(2, MemoryUnit.MB, true)//
+        )//
+        .withResilienceStrategy(new ThrowingResilienceStrategy<>())//
     );
     String key = "cache_test_key";
     cache.put(key, "cache_test_value");
     cache.get(key);
-    cache.remove(key);
   }
 }

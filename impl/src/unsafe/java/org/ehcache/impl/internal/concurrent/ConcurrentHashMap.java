@@ -3364,13 +3364,13 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
      * for a table read.
      */
     static class Traverser<K,V> {
-        Node<K,V>[] tab;        // current table; updated if resized
-        Node<K,V> next;         // the next entry to use
+        Node<K,V>[] tab;        // current table; updated if resized 当前表格；如果调整大小，则更新
+        Node<K,V> next;         // the next entry to use 下一个要使用的条目
         TableStack<K,V> stack, spare; // to save/restore on ForwardingNodes
-        int index;              // index of bin to use next
-        int baseIndex;          // current index of initial table
-        int baseLimit;          // index bound for initial table
-        final int baseSize;     // initial table size
+        int index;              // index of bin to use next 下一个要使用的bin的索引
+        int baseIndex;          // current index of initial table 初始表的当前索引
+        int baseLimit;          // index bound for initial table 初始表的索引边界
+        final int baseSize;     // initial table size 初始表大小
 
         Traverser(Node<K,V>[] tab, int size, int index, int limit) {
             this.tab = tab;
@@ -3382,35 +3382,48 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
 
         /**
          * Advances if possible, returning next valid node, or null if none.
+         * 如果可能，则前进，返回下一个有效节点，如果没有，则返回null。
          */
-        final Node<K,V> advance() {
-            Node<K,V> e;
-            if ((e = next) != null)
-                e = e.next;
-            for (;;) {
-                Node<K,V>[] t; int i, n;  // must use locals in checks
-                if (e != null)
-                    return next = e;
-                if (baseIndex >= baseLimit || (t = tab) == null ||
-                    (n = t.length) <= (i = index) || i < 0)
-                    return next = null;
-                if ((e = tabAt(t, i)) != null && e.hash < 0) {
-                    if (e instanceof ForwardingNode) {
-                        tab = ((ForwardingNode<K,V>)e).nextTable;
-                        e = null;
-                        pushState(t, i, n);
-                        continue;
-                    }
-                    else if (e instanceof TreeBin)
-                        e = ((TreeBin<K,V>)e).first;
-                    else
-                        e = null;
-                }
-                if (stack != null)
-                    recoverState(n);
-                else if ((index = i + baseSize) >= n)
-                    index = ++baseIndex; // visit upper slots if present
+        final Node<K, V> advance() {
+          Node<K, V> e;
+          if ((e = next) != null) {
+            e = e.next;
+          }
+          for (; ; ) {
+            Node<K, V>[] t;
+            int i, n;  // must use locals in checks 在支票上必须使用本地人
+            if (e != null) {
+              // yukms TODO: next不为空直接取next
+              return next = e;
             }
+            if (baseIndex >= baseLimit // 超过限制
+              || (t = tab) == null //
+              || (n = t.length) <= (i = index)// index超过tab长度
+              || i < 0) {
+              return next = null;
+            }
+            // yukms TODO: 从tab[index]取
+            if ((e = tabAt(t, i)) != null && e.hash < 0) {
+              if (e instanceof ForwardingNode) {
+                // yukms TODO: 正在扩容
+                tab = ((ForwardingNode<K, V>) e).nextTable;
+                e = null;
+                pushState(t, i, n);
+                continue;
+              } else if (e instanceof TreeBin) {
+                // yukms TODO: tree
+                e = ((TreeBin<K, V>) e).first;
+              } else {
+                e = null;
+              }
+            }
+            if (stack != null) {
+              recoverState(n);
+            } else if ((index = i + baseSize) >= n) {
+              // yukms TODO: 超过tab.length则回到baseIndex
+              index = ++baseIndex; // visit upper slots if present
+            }
+          }
         }
 
         /**
@@ -6490,6 +6503,7 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
         V maxValue = null;
 
         int n = tab.length;
+        // yukms TODO: 随机取
         int start = rndm.nextInt(n);
 
         Traverser<K, V> t = new Traverser<>(tab, n, start, n);
@@ -6515,6 +6529,7 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
             }
         }
 
+        // yukms TODO: 若随机未取到理想的样本量，则index从0到start取样本
         return getEvictionCandidateWrap(tab, start, size, maxKey, maxValue, prioritizer, evictionAdvisor);
     }
 

@@ -42,11 +42,14 @@ import javax.annotation.Nonnull;
 /**
  * The {@code Store} interface represents the backing storage of a {@link Cache}. It abstracts the support for multiple
  * tiers, eventing, eviction and expiry.
+ * {@code Store}接口表示{@link Cache}的后备存储。它抽象了对多层、事件、逐出和到期的支持。
  * <p>
  * It maps key of type {@code K} to {@link ValueHolder value holder} which contains value of type {@code V} and
  * associated metadata.
+ * 它将{@code K}类型的键映射到{@link ValueHolder value holder}，其中包含{@code V}类型的值和相关元数据。
  * <p>
  * Store implementations must not handle {@code null} keys or values.
+ * 存储实现不能处理{@code null}键或值。
  *
  * @param <K> the key type
  * @param <V> the value type
@@ -58,14 +61,18 @@ public interface Store<K, V> extends ConfigurationChangeSupport {
    * which the specified key is mapped, or {@code null} if this store contains no
    * mapping for the key or if it was evicted (or became expired) since it was
    * initially installed.
+   * 返回指定键映射到的{@link Store.ValueHolder ValueHolder}，或者{@code null}如果此存储不包含该键的映射，或者自最初安装以来已被收回（或过期）。
    * <p>
    * More formally, if this store contains a non-expired mapping from a key
    * {@code k} to a {@link Store.ValueHolder ValueHolder}
    * {@code v} such that {@code key.equals(k)},
    * then this method returns {@code v}; otherwise it returns
    * {@code null}.  (There can be at most one such mapping.)
+   * 更正式地说，如果此存储包含从键{@code k}到{@link Store.ValueHolder ValueHolder}{@code v}的未过期映射，使得{@code key.equals（k）}，则此方法返回{@code v}；
+   * 否则返回{@code null}。（最多可以有一个这样的映射。）
    * <p>
    * The key cannot be {@code null}.
+   * 密钥不能为{@code null}。
    *
    * @param key the key of the mapping to lookup
    * @return the value mapped to this key or {@code null} if no mapping exists or is expired
@@ -79,9 +86,11 @@ public interface Store<K, V> extends ConfigurationChangeSupport {
   /**
    * Returns {@code true} if this store contains the specified key
    * and the entry is not expired.
+   * 如果此存储包含指定的密钥且条目未过期，则返回{@code true}。
    * <p>
    * More formally, returns {@code true} if and only if this store
    * contains a key {@code k} such that {@code (o.equals(k))}.
+   * 更正式地说，返回{@code true}当且仅当此存储包含一个键{@code k}，使得{@code（o.equals（k））}。
    * <p>
    * The key cannot be {@code null}.
    *

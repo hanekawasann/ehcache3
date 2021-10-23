@@ -66,7 +66,7 @@ public class TieredStore<K, V> implements Store<K, V> {
     this.realCachingTier = cachingTier;
     this.noopCachingTier = new NoopCachingTier<>(authoritativeTier);
 
-
+    // yukms TODO: 上层失效
     this.realCachingTier.setInvalidationListener(TieredStore.this.authoritativeTier::flush);
 
     this.authoritativeTier.setInvalidationValve(new AuthoritativeTier.InvalidationValve() {
@@ -110,6 +110,7 @@ public class TieredStore<K, V> implements Store<K, V> {
       // yukms TODO: put直接给最底层
       return authoritativeTier.put(key, value);
     } finally {
+      // yukms TODO: 高层的值直接移除
       cachingTier().invalidate(key);
     }
   }
@@ -135,8 +136,10 @@ public class TieredStore<K, V> implements Store<K, V> {
   @Override
   public boolean remove(K key) throws StoreAccessException {
     try {
+      // yukms TODO: 底层移除
       return authoritativeTier.remove(key);
     } finally {
+      // yukms TODO: 高层移除
       cachingTier().invalidate(key);
     }
   }
