@@ -6503,7 +6503,7 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
         V maxValue = null;
 
         int n = tab.length;
-        // yukms TODO: 随机取
+        // yukms TODO: 随机槽
         int start = rndm.nextInt(n);
 
         Traverser<K, V> t = new Traverser<>(tab, n, start, n);
@@ -6516,7 +6516,9 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
                     maxValue = val;
                 }
                 if (--size == 0) {
+                  // yukms TODO: 还剩一个样本
                     for (int terminalIndex = t.index; (p = t.advance()) != null && t.index == terminalIndex; ) {
+                      // yukms TODO: 同一槽？？？
                         key = p.key;
                         val = p.val;
                         if (!evictionAdvisor.adviseAgainstEviction(key, val) && prioritizer.compare(val, maxValue) > 0) {
@@ -6544,6 +6546,7 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
                     maxVal = val;
                 }
                 if (--size == 0) {
+                  // yukms TODO: 还剩一个样本
                     for (int terminalIndex = t.index; (p = t.advance()) != null && t.index == terminalIndex; ) {
                         key = p.key;
                         val = p.val;

@@ -135,9 +135,9 @@ public class CacheManagerBuilderTest {
 
       CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
           ResourcePoolsBuilder.newResourcePoolsBuilder()//
-            .heap(1, MemoryUnit.B)//
-          //.offheap(1, MemoryUnit.MB)//
-          //.disk(2, MemoryUnit.MB, true)//
+            //.heap(1, MemoryUnit.B)//
+          .offheap(1, MemoryUnit.MB)//
+          //.disk(1, MemoryUnit.MB, true)//
         )//
         .withResilienceStrategy(new ThrowingResilienceStrategy<>())//
     );

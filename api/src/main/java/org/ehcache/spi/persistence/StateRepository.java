@@ -21,13 +21,16 @@ import java.util.function.Predicate;
 
 /**
  * A repository allowing to preserve state in the context of a {@link org.ehcache.Cache}.
+ * 允许在{@link org.ehcache.Cache}上下文中保留状态的存储库。
  */
 public interface StateRepository {
 
   /**
    * Gets a named state holder rooted in the current {@code StateRepository}.
+   * 获取在当前{@code StateRepository}中扎根的命名状态持有者
    * <p>
    * If the state holder existed already, it is returned with its content fully available.
+   * 如果国家持有者已经存在，则返回时其内容完全可用。
    *
    * @deprecated Replaced by {@link #getPersistentStateHolder(String, Class, Class, Predicate, ClassLoader)} that takes in a Predicate that authorizes a class for deserialization
    *
@@ -45,8 +48,10 @@ public interface StateRepository {
 
   /**
    * Gets a named state holder rooted in the current {@code StateRepository}.
+   * 获取在当前{@code StateRepository}中扎根的命名状态持有者
    * <p>
    * If the state holder existed already, it is returned with its content fully available.
+   * 如果国家持有者已经存在，则返回时其内容完全可用。
    *
    * @param name the state holder name
    * @param keyClass concrete key type
