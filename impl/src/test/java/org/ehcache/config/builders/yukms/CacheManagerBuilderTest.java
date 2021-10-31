@@ -143,6 +143,7 @@ public class CacheManagerBuilderTest {
     );
     String key = "cache_test_key";
     cache.put(key, "cache_test_value");
+    cache.put(key, "cache_test_value1");
     cache.get(key);
   }
 }
