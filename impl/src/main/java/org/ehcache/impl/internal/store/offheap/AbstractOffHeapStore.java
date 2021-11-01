@@ -185,23 +185,29 @@ public abstract class AbstractOffHeapStore<K, V> extends BaseStore<K, V> impleme
         long now = timeSource.getTimeMillis();
 
         if (mappedValue.isExpired(now)) {
+          // yukms TODO: 已过期
           onExpiration(mappedKey, mappedValue, eventSink);
           return null;
         }
 
         if (updateAccess) {
+          // yukms TODO: updateAccess？？？
           mappedValue.forceDeserialization();
+          // yukms TODO: 设置访问时间和过期时间
           OffHeapValueHolder<V> valueHolder = setAccessTimeAndExpiryThenReturnMapping(mappedKey, mappedValue, now, eventSink);
           if (valueHolder == null) {
+            // yukms TODO: 写入后值已过期
             heldValue.set(mappedValue);
           }
           return valueHolder;
         } else if (touchValue) {
+          // yukms TODO: touchValue？？？
           mappedValue.forceDeserialization();
         }
         return mappedValue;
       });
       if (result == null && heldValue.get() != null) {
+        // yukms TODO: 获取到值
         result = heldValue.get();
       }
       eventDispatcher.releaseEventSink(eventSink);
@@ -1101,6 +1107,7 @@ public abstract class AbstractOffHeapStore<K, V> extends BaseStore<K, V> impleme
       return null;
     }
     valueHolder.accessed(now, duration);
+    // yukms TODO: 数据写会
     valueHolder.writeBack();
     return valueHolder;
   }
