@@ -18,13 +18,22 @@ import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.config.units.MemoryUnit;
 import org.ehcache.core.EhcacheManager;
 import org.ehcache.core.internal.resilience.ThrowingResilienceStrategy;
+import org.ehcache.core.internal.statistics.DefaultStatisticsService;
+import org.ehcache.core.spi.service.StatisticsService;
+import org.ehcache.core.statistics.CacheStatistics;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class CacheManagerBuilderTest {
   @Test
   public void test_build() {
-    CacheManagerBuilder.newCacheManagerBuilder().build(true);
+    StatisticsService statisticsService = new DefaultStatisticsService();
+    CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder().using(statisticsService).build(true);
+    Cache<String, String> cache = cacheManager.createCache("cache1",
+      CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
+        ResourcePoolsBuilder.newResourcePoolsBuilder().heap(2, MemoryUnit.MB)));
+    cache.get("1");
+    CacheStatistics statistics = statisticsService.getCacheStatistics("cache1");
   }
 
   @Test

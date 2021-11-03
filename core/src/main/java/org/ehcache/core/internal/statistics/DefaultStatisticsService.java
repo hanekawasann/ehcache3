@@ -79,6 +79,7 @@ public class DefaultStatisticsService implements StatisticsService, CacheManager
     Class<S> outcomeType = getOutcomeType(translation);
 
     // If the original stat doesn't exist, we do not need to translate it
+    // yukms TODO: 如果原始数据不存在，我们不需要翻译它
     if (StatsUtils.hasOperationStat(store, outcomeType, targetName)) {
 
       MappedOperationStatistic<S, T> operationStatistic = new MappedOperationStatistic<>(store, translation, statisticName, tierHeight, targetName, tag);

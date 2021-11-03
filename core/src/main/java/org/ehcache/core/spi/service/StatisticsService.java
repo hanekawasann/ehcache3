@@ -30,11 +30,13 @@ import java.util.function.Supplier;
 
 /**
  * Service providing raw statistics for cache and tier usage.
+ * 服务提供缓存和层使用的原始统计信息。
  */
 public interface StatisticsService extends Service {
 
   /**
    * Return the object containing the statistics for a given cache name.
+   * 返回包含给定缓存名称统计信息的对象。
    *
    * @param cacheName name (alias) of the cache
    * @return all the cache statistics
@@ -43,6 +45,7 @@ public interface StatisticsService extends Service {
 
   /**
    * Registers the object to parent
+   * 将对象注册到父对象
    * @param toAssociate object to associate
    * @param parent to which object is associated
    */
@@ -50,6 +53,7 @@ public interface StatisticsService extends Service {
 
   /**
    * Registers store of the cache for statistics
+   * 为统计信息注册缓存的存储
    * @param store {@link Store} of the cache to be registered
    * @param targetName statistics name after translation
    * @param tierHeight of the store
@@ -62,6 +66,7 @@ public interface StatisticsService extends Service {
 
   /**
    * De-registers object from the parent
+   * 从父对象中取消注册对象
    * @param toDeassociate object to dissociate
    * @param parent to which object is associated
    */
@@ -69,12 +74,14 @@ public interface StatisticsService extends Service {
 
   /**
    * Clears all associations
+   * 清除所有关联
    * @param node for which all associations are cleared
    */
   void cleanForNode(Object node);
 
   /**
    * Register statistics with value supplier
+   * 向价值供应商登记统计数据
    * @param context association object
    * @param name of the statistics
    * @param type StatisticType to be registered
@@ -86,6 +93,7 @@ public interface StatisticsService extends Service {
 
   /**
    * Create operation statistic for provided type
+   * 为提供的类型创建操作统计信息
    * @param name of the operation observer
    * @param outcome Class of the type of statistic
    * @param tag with which the statistics is associated

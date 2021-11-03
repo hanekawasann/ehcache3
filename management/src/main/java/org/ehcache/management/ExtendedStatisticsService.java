@@ -31,6 +31,7 @@ public interface ExtendedStatisticsService extends StatisticsService {
 
   /**
    * Create statistics registry
+   * 创建统计信息注册表
    * @param cacheName name (alias) of the cache
    * @param cache the {@link Cache} associated with the given alias
    * @param timeSource source of time for statistics maintenance
@@ -39,12 +40,14 @@ public interface ExtendedStatisticsService extends StatisticsService {
 
   /**
    * Registers a cache for statistics
+   * 为统计信息注册缓存
    * @param cacheName name (alias) of the cache
    */
   void registerCacheStatistics(String cacheName);
 
   /**
    * Returns the Statistics descriptor for the cache with the given alias
+   * 返回具有给定别名的缓存的统计描述符
    * @param cacheName name (alias) of the cache
    * @return the collection of {@link StatisticDescriptor}s of the cache
    */
@@ -52,6 +55,7 @@ public interface ExtendedStatisticsService extends StatisticsService {
 
   /**
    * Registers derived statistics for the cache
+   * 为缓存注册派生的统计信息
    * @param <T> the generic type of statistics
    * @param cacheName name (alias) of the cache
    * @param cache the cache associated with the given alias
@@ -64,6 +68,7 @@ public interface ExtendedStatisticsService extends StatisticsService {
 
   /**
    * Returns the statistics for the cache
+   * 返回缓存的统计信息
    * @param cacheName name (alias) of the cache
    * @param statisticNames names of the statistics
    * @param since time since statistics needs to be collected
