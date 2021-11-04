@@ -1,9 +1,6 @@
 package org.ehcache.config.builders.yukms;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.LineNumberReader;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
@@ -17,6 +14,7 @@ import org.ehcache.config.builders.ExpiryPolicyBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.config.units.MemoryUnit;
 import org.ehcache.core.EhcacheManager;
+import org.ehcache.core.config.store.StoreStatisticsConfiguration;
 import org.ehcache.core.internal.resilience.ThrowingResilienceStrategy;
 import org.ehcache.core.internal.statistics.DefaultStatisticsService;
 import org.ehcache.core.spi.service.StatisticsService;
@@ -28,10 +26,11 @@ public class CacheManagerBuilderTest {
   @Test
   public void test_build() {
     StatisticsService statisticsService = new DefaultStatisticsService();
+    StoreStatisticsConfiguration statisticsConfiguration = new StoreStatisticsConfiguration(true);
     CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder().using(statisticsService).build(true);
     Cache<String, String> cache = cacheManager.createCache("cache1",
       CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
-        ResourcePoolsBuilder.newResourcePoolsBuilder().heap(2, MemoryUnit.MB)));
+        ResourcePoolsBuilder.newResourcePoolsBuilder().heap(2, MemoryUnit.MB)).withService(statisticsConfiguration));
     cache.get("1");
     CacheStatistics statistics = statisticsService.getCacheStatistics("cache1");
   }
@@ -108,13 +107,13 @@ public class CacheManagerBuilderTest {
     Cache<String, String> cache = cacheManager.createCache("cache_test",
 
       CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
-        ResourcePoolsBuilder.newResourcePoolsBuilder()//
-          .heap(1, MemoryUnit.B)//
-          .offheap(1, MemoryUnit.MB)//
-          .disk(2, MemoryUnit.MB, true)//
-      )//
+          ResourcePoolsBuilder.newResourcePoolsBuilder()//
+            .heap(1, MemoryUnit.B)//
+            .offheap(1, MemoryUnit.MB)//
+            .disk(2, MemoryUnit.MB, true)//
+        )//
         .withResilienceStrategy(new ThrowingResilienceStrategy<>())//
-      .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.of(1, ChronoUnit.SECONDS)))//
+        .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.of(1, ChronoUnit.SECONDS)))//
     );
     String key = "cache_test_key";
     for (int i = 1; i <= 10_000_000; i++) {
@@ -144,9 +143,9 @@ public class CacheManagerBuilderTest {
 
       CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
           ResourcePoolsBuilder.newResourcePoolsBuilder()//
-            //.heap(1, MemoryUnit.B)//
-          .offheap(1, MemoryUnit.MB)//
-          //.disk(1, MemoryUnit.MB, true)//
+            .heap(1, MemoryUnit.B)//
+            .offheap(2, MemoryUnit.MB)//
+          .disk(3, MemoryUnit.MB, true)//
         )//
         .withResilienceStrategy(new ThrowingResilienceStrategy<>())//
     );
