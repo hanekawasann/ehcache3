@@ -27,16 +27,19 @@ public class DefaultSizeOfEngineConfiguration implements ServiceConfiguration<Si
 
   /**
    * Default maximum object graph count after which sizing stops
+   * 默认最大对象图计数，在该计数之后大小调整停止
    */
   public static final int DEFAULT_OBJECT_GRAPH_SIZE = 1000;
 
   /**
    * Default maximum object size after which sizing stops
+   * 默认最大对象大小，超过该大小后停止调整大小
    */
   public static final long DEFAULT_MAX_OBJECT_SIZE = Long.MAX_VALUE;
 
   /**
    * Default maximum object size unit after which sizing stops
+   * 默认最大对象大小单位，超过该单位后，大小调整停止
    */
   public static final MemoryUnit DEFAULT_UNIT = MemoryUnit.B;
 
